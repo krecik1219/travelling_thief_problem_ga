@@ -13,6 +13,8 @@ class TtpConfigBase
 {
 public:
 	explicit TtpConfigBase(TtpConfig&& ttpConfig);
+	
+	const TtpConfig& getConfig() const;
 		
 private:
 	const TtpConfig ttpConfig;

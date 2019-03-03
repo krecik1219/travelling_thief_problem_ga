@@ -29,7 +29,7 @@ ttp::TtpConfigBase InstanceLoader::loadTtpConfig(const std::string& filePath) co
 	return ttp::TtpConfigBase(std::move(ttpConfig));
 }
 
-void InstanceLoader::decideWhatToDoWithLine(const std::string& line, ReadingType& readingType, ttp::TtpConfig ttpConfig) const
+void InstanceLoader::decideWhatToDoWithLine(const std::string& line, ReadingType& readingType, ttp::TtpConfig& ttpConfig) const
 {
 	if (line.find("PROBLEM NAME:") != std::string::npos)
 	{
@@ -102,7 +102,7 @@ std::string InstanceLoader::prepareValueToStore(const std::string& s) const
 	return value;
 }
 
-void InstanceLoader::storeCityData(const std::string & line, ttp::TtpConfig ttpConfig) const
+void InstanceLoader::storeCityData(const std::string & line, ttp::TtpConfig& ttpConfig) const
 {
 	std::istringstream ss(line);
 	std::string token;
@@ -126,7 +126,7 @@ void InstanceLoader::storeCityData(const std::string & line, ttp::TtpConfig ttpC
 	);
 }
 
-void InstanceLoader::storeItemData(const std::string & line, ttp::TtpConfig ttpConfig) const
+void InstanceLoader::storeItemData(const std::string & line, ttp::TtpConfig& ttpConfig) const
 {
 	std::istringstream ss(line);
 	std::string token;

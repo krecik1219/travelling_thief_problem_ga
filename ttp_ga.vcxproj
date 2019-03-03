@@ -123,6 +123,7 @@
   <ItemGroup>
     <ClCompile Include="src\loader\InstanceLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\ttp\TspInstance.cpp" />
     <ClCompile Include="src\ttp\TtpConfigBase.cpp" />
     <ClCompile Include="src\utils\StringUtils.cpp" />
   </ItemGroup>
@@ -131,6 +132,7 @@
     <ClInclude Include="src\loader\InstanceLoader.hpp" />
     <ClInclude Include="src\ttp\City.hpp" />
     <ClInclude Include="src\ttp\Item.hpp" />
+    <ClInclude Include="src\ttp\TspInstance.hpp" />
     <ClInclude Include="src\ttp\TtpConfig.hpp" />
     <ClInclude Include="src\ttp\TtpConfigBase.hpp" />
     <ClInclude Include="src\utils\StringUtils.hpp" />
