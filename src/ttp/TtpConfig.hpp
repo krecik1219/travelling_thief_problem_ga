@@ -16,8 +16,8 @@ struct TtpConfig
 	uint32_t dimenssion;
 	uint32_t itemsNum;
 	uint32_t capacityOfKnapsack;
-	float minSpeed;
-	float maxSpeed;
+	float minVelocity;
+	float maxVelocity;
 	float rentingRatio;
 	std::map<uint32_t, City> cities;
 	std::map<uint32_t, Item> items;

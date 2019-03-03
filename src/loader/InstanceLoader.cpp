@@ -59,12 +59,12 @@ void InstanceLoader::decideWhatToDoWithLine(const std::string& line, ReadingType
 	else if (line.find("MIN SPEED:") != std::string::npos)
 	{
 		auto value = prepareValueToStore(line);
-		ttpConfig.minSpeed = std::stof(value);
+		ttpConfig.minVelocity = std::stof(value);
 	}
 	else if (line.find("MAX SPEED:") != std::string::npos)
 	{
 		auto value = prepareValueToStore(line);
-		ttpConfig.maxSpeed = std::stof(value);
+		ttpConfig.maxVelocity = std::stof(value);
 	}
 	else if (line.find("RENTING RATIO:") != std::string::npos)
 	{

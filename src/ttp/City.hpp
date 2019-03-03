@@ -6,7 +6,7 @@ namespace ttp {
 
 struct City
 {
-	float getDistance(const City& other)
+	float getDistance(const City& other) const
 	{
 		return sqrt((other.x - x) * (other.x - x) + (other.y - y) * (other.y - y));
 	}
