@@ -18,6 +18,7 @@ public:
 
 	float getTripTime(const Knapsack& knapsack, const TtpConfig & config) const;
 	float getCurrentVelocity(const float distance, const uint32_t currentWeight, const TtpConfig & config) const;
+	void mutation();
 
 private:
 	std::vector<ttp::City> cityChain;

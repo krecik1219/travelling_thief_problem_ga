@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <utils/Random.hpp>
+
 namespace ttp {
 
 TspSolution::TspSolution(std::vector<City>&& cities)
@@ -35,6 +37,16 @@ float TspSolution::getTripTime(const Knapsack& knapsack, const TtpConfig& config
 float TspSolution::getCurrentVelocity(const float distance, const uint32_t currentWeight, const TtpConfig& config) const
 {
 	return config.maxVelocity - currentWeight * ((config.maxVelocity - config.minVelocity) / config.capacityOfKnapsack);
+}
+
+void TspSolution::mutation()
+{
+	auto& random = utils::rnd::Random::getInstance();
+	auto first = random.getRandomInt(0, cityChain.size() - 1);
+	auto second = random.getRandomInt(0, cityChain.size() - 1);
+	auto firstIt = std::next(cityChain.begin(), first);
+	auto secondIt = std::next(cityChain.begin(), second);
+	std::iter_swap(firstIt, secondIt);
 }
 
 } // namespace ttp

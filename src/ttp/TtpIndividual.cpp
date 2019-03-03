@@ -16,7 +16,7 @@ float TtpIndividual::computeFitness() const
 
 void TtpIndividual::mutation()
 {
-
+	tsp.mutation();
 }
 
 } // namespace ttp
