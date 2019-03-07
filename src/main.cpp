@@ -25,6 +25,10 @@ int main()
 		auto fitnessOfOffspring = offspring.getFitness();
 		offspring.mutation();
 		auto fitnessAfterMut = offspring.getFitness();
+		std::cout << "fitness1: " << fitness1 << std::endl;
+		std::cout << "fitness2: " << fitness2 << std::endl;
+		std::cout << "fitnessOfOffspring: " << fitnessOfOffspring << std::endl;
+		std::cout << "fitnessAfterMut: " << fitnessAfterMut << std::endl;
 		std::cout << "random created" << std::endl;
 	}
 	catch (loader::ConfigParsingException& e)

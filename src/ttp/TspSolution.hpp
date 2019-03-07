@@ -17,7 +17,7 @@ public:
 	static TspSolution createRandom(const TtpConfig& ttpConfig, RandomGenerator&& g);
 
 	float getTripTime(const Knapsack& knapsack) const;
-	float getCurrentVelocity(const float distance, const uint32_t currentWeight) const;
+	float getCurrentVelocity(const uint32_t currentWeight) const;
 	uint32_t getStepsNumTo(const uint32_t refCity, const uint32_t cityId) const;
 	uint32_t getIndexOfCityInChain(const uint32_t cityId) const;
 	void mutation();

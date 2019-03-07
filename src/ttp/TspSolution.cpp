@@ -25,19 +25,19 @@ float TspSolution::getTripTime(const Knapsack& knapsack) const
 	{
 		auto distance = cityChain[i].getDistance(cityChain[i + 1]);
 		totalWeight += knapsack.getWeightForCity(cityChain[i].index);
-		auto velocity = getCurrentVelocity(distance, totalWeight);
+		auto velocity = getCurrentVelocity(totalWeight);
 		tripTime += distance / velocity;
 	}
 	// below finishing TSP cycle
 	auto index = cityChain.size() - 1;
 	auto distance = cityChain[index].getDistance(cityChain[0]);
 	totalWeight += knapsack.getWeightForCity(cityChain[index].index);
-	auto velocity = getCurrentVelocity(distance, totalWeight);
+	auto velocity = getCurrentVelocity(totalWeight);
 	tripTime += distance / velocity;
 	return tripTime;
 }
 
-float TspSolution::getCurrentVelocity(const float distance, const uint32_t currentWeight) const
+float TspSolution::getCurrentVelocity(const uint32_t currentWeight) const
 {
 	return ttpConfig.maxVelocity - currentWeight * ((ttpConfig.maxVelocity - ttpConfig.minVelocity) / ttpConfig.capacityOfKnapsack);
 }
