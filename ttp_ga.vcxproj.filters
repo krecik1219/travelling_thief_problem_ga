@@ -27,7 +27,16 @@
     <ClCompile Include="src\ttp\TtpConfigBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ttp\TspInstance.cpp">
+    <ClCompile Include="src\ttp\Knapsack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ttp\TspSolution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ttp\TtpIndividual.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\RandomUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,7 +62,16 @@
     <ClInclude Include="src\ttp\TtpConfigBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ttp\TspInstance.hpp">
+    <ClInclude Include="src\ttp\Knapsack.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ttp\TtpIndividual.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ttp\TspSolution.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\RandomUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

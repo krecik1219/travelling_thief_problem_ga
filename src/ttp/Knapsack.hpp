@@ -18,12 +18,13 @@ public:
 	const ItemsPerCity& getItemsPerCity() const;
 	uint32_t getWeightForCity(const uint32_t cityId) const;
 	void fillKnapsack(const TtpConfig& ttpConfig);
-	uint32_t getKnapsackValue() const;
+	int32_t getKnapsackValue() const;
 
 private:
 	const uint32_t capacity;
 	uint32_t currentWeight;
 	ItemsPerCity itemsPerCity;
+	int32_t knapsackValue;
 };
 
 } // namespace ttp

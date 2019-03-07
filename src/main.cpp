@@ -3,7 +3,8 @@
 
 #include <loader/InstanceLoader.hpp>
 #include <loader/ConfigParsingException.hpp>
-#include <ttp/TspInstance.hpp>
+#include <ttp/TtpIndividual.hpp>
+#include <ttp/Knapsack.hpp>
 
 int main()
 {
@@ -13,8 +14,17 @@ int main()
 	loader::InstanceLoader loader;
 	try
 	{
-		auto ttpConfigBase = loader.loadTtpConfig("data/easy_0.ttp");
-		auto rndTsp = ttp::TspInstance::createRandom(ttpConfigBase.getConfig(), g);
+		auto ttpConfigBase = loader.loadTtpConfig("data/trivial_0.ttp");
+		ttp::KnapsackPtr knapsack = std::make_shared<ttp::Knapsack>(ttpConfigBase.getConfig().capacityOfKnapsack);
+		knapsack->fillKnapsack(ttpConfigBase.getConfig());
+		auto rndTtp1 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), knapsack, g);
+		auto rndTtp2 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), knapsack, g);
+		auto fitness1 = rndTtp1.getFitness();
+		auto fitness2 = rndTtp2.getFitness();
+		auto offspring = rndTtp1.crossover(rndTtp2);
+		auto fitnessOfOffspring = offspring.getFitness();
+		offspring.mutation();
+		auto fitnessAfterMut = offspring.getFitness();
 		std::cout << "random created" << std::endl;
 	}
 	catch (loader::ConfigParsingException& e)

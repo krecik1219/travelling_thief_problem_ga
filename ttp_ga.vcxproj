@@ -123,8 +123,11 @@
   <ItemGroup>
     <ClCompile Include="src\loader\InstanceLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\ttp\TspInstance.cpp" />
+    <ClCompile Include="src\ttp\Knapsack.cpp" />
+    <ClCompile Include="src\ttp\TspSolution.cpp" />
     <ClCompile Include="src\ttp\TtpConfigBase.cpp" />
+    <ClCompile Include="src\ttp\TtpIndividual.cpp" />
+    <ClCompile Include="src\utils\RandomUtils.cpp" />
     <ClCompile Include="src\utils\StringUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -132,9 +135,12 @@
     <ClInclude Include="src\loader\InstanceLoader.hpp" />
     <ClInclude Include="src\ttp\City.hpp" />
     <ClInclude Include="src\ttp\Item.hpp" />
-    <ClInclude Include="src\ttp\TspInstance.hpp" />
+    <ClInclude Include="src\ttp\Knapsack.hpp" />
+    <ClInclude Include="src\ttp\TspSolution.hpp" />
     <ClInclude Include="src\ttp\TtpConfig.hpp" />
     <ClInclude Include="src\ttp\TtpConfigBase.hpp" />
+    <ClInclude Include="src\ttp\TtpIndividual.hpp" />
+    <ClInclude Include="src\utils\RandomUtils.hpp" />
     <ClInclude Include="src\utils\StringUtils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

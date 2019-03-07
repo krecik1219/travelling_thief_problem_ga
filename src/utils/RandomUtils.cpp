@@ -1,4 +1,4 @@
-#include "Random.hpp"
+#include "RandomUtils.hpp"
 
 namespace utils {
 namespace rnd {
@@ -30,7 +30,7 @@ std::mt19937 & Random::getRndGen()
 
 Random::Random()
 	: rd()
-	, gen(rd)
+	, gen(rd())
 {
 }
 

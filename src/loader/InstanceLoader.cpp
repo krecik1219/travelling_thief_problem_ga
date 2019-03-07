@@ -26,6 +26,7 @@ ttp::TtpConfigBase InstanceLoader::loadTtpConfig(const std::string& filePath) co
 		decideWhatToDoWithLine(line, readingType, ttpConfig);
 	}
 
+	ttpConfig.fillNearestDistanceLookup();
 	return ttp::TtpConfigBase(std::move(ttpConfig));
 }
 
@@ -121,9 +122,7 @@ void InstanceLoader::storeCityData(const std::string & line, ttp::TtpConfig& ttp
 		throw ConfigParsingException("Parsing city data - bad file structure: " + line);
 	}
 	auto index = static_cast<uint32_t>(std::stoi(tokens[0]));
-	ttpConfig.cities.emplace(std::make_pair(
-		index, ttp::City{ index, std::stof(tokens[1]), std::stof(tokens[2]) })
-	);
+	ttpConfig.cities.emplace_back(ttp::City{ index, std::stof(tokens[1]), std::stof(tokens[2]) });
 }
 
 void InstanceLoader::storeItemData(const std::string & line, ttp::TtpConfig& ttpConfig) const
@@ -148,9 +147,7 @@ void InstanceLoader::storeItemData(const std::string & line, ttp::TtpConfig& ttp
 	auto profit = static_cast<uint32_t>(std::stoi(tokens[1]));
 	auto weight = static_cast<uint32_t>(std::stoi(tokens[2]));
 	auto cityId = static_cast<uint32_t>(std::stoi(tokens[3]));
-	ttpConfig.items.emplace(std::make_pair(
-		index, ttp::Item{ index, profit, weight, cityId })
-	);
+	ttpConfig.items.emplace_back(ttp::Item{ index, profit, weight, cityId });
 }
 
 } // namespace loader
