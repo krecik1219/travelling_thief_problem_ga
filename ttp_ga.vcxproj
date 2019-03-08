@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;$(IncludePath)</IncludePath>
+    <IncludePath>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -86,7 +86,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link />
@@ -131,6 +131,7 @@
     <ClCompile Include="src\utils\StringUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ga\GAlg.hpp" />
     <ClInclude Include="src\loader\ConfigParsingException.hpp" />
     <ClInclude Include="src\loader\InstanceLoader.hpp" />
     <ClInclude Include="src\ttp\City.hpp" />

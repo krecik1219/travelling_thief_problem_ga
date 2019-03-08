@@ -11,7 +11,12 @@ TtpIndividual::TtpIndividual(const TtpConfig& ttpConfig, TspSolution&& tsp, Knap
 {
 }
 
-float TtpIndividual::getFitness()
+float TtpIndividual::getCurrentFitness() const
+{
+	return currentFitness;
+}
+
+float TtpIndividual::evaluate()
 {
 	if (isCurrentFitnessValid)
 		return currentFitness;
@@ -38,7 +43,7 @@ void TtpIndividual::mutation()
 	isCurrentFitnessValid = false;
 }
 
-TtpIndividual TtpIndividual::crossover(const TtpIndividual& parent2)
+TtpIndividual TtpIndividual::crossover(const TtpIndividual& parent2) const
 {
 	auto tripTime1 = static_cast<float>(knapsack->getKnapsackValue()) - currentFitness;
 	auto tripTime2 = static_cast<float>(knapsack->getKnapsackValue()) - parent2.currentFitness;

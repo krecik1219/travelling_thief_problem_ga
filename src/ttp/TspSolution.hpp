@@ -11,7 +11,13 @@ namespace ttp {
 class TspSolution
 {
 public:
+	TspSolution() = delete;
+	TspSolution(const TspSolution& other) = default;
+	TspSolution(TspSolution&& other) = default;
 	TspSolution(const TtpConfig& ttpConfig, std::vector<City>&& cities);
+
+	TspSolution& operator=(const TspSolution& other) = delete;
+	TspSolution& operator=(TspSolution&& other) = delete;
 
 	template <class RandomGenerator>
 	static TspSolution createRandom(const TtpConfig& ttpConfig, RandomGenerator&& g);
@@ -22,7 +28,7 @@ public:
 	uint32_t getIndexOfCityInChain(const uint32_t cityId) const;
 	void mutation();
 
-	TspSolution crossover(const float parent1Fitness, const TspSolution& parent2, const float parent2Fitness);
+	TspSolution crossover(const float parent1Fitness, const TspSolution& parent2, const float parent2Fitness) const;
 
 private:
 	const TtpConfig& ttpConfig;

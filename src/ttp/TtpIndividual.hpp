@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "TspSolution.hpp"
 
 namespace ttp {
@@ -9,15 +11,21 @@ using KnapsackPtr = std::shared_ptr<Knapsack>;
 class TtpIndividual
 {
 public:
-
+	TtpIndividual() = delete;
+	TtpIndividual(const TtpIndividual& other) = default;
+	TtpIndividual(TtpIndividual&& other) = default;
 	TtpIndividual(const TtpConfig& ttpConfig, TspSolution&& tsp, KnapsackPtr knapsack);
 
-	template <class RandomGenerator>
-	static TtpIndividual createRandom(const TtpConfig& ttpConfig, KnapsackPtr knapsack, RandomGenerator&& g);
+	TtpIndividual& operator=(const TtpIndividual&) = delete;
+	TtpIndividual& operator=(TtpIndividual&&) = delete;
 
-	float getFitness();
+	template <class RandomGenerator>
+	static std::unique_ptr<TtpIndividual> createRandom(const TtpConfig& ttpConfig, KnapsackPtr knapsack, RandomGenerator&& g);
+
+	float getCurrentFitness() const;
+	float evaluate();
 	void mutation();
-	TtpIndividual crossover(const TtpIndividual& parent2);
+	TtpIndividual crossover(const TtpIndividual& parent2) const;
 
 private:
 	float computeFitness() const;
@@ -31,9 +39,9 @@ private:
 };
 
 template <class RandomGenerator>
-TtpIndividual TtpIndividual::createRandom(const TtpConfig& ttpConfig, KnapsackPtr knapsack, RandomGenerator&& g)
+std::unique_ptr<TtpIndividual> TtpIndividual::createRandom(const TtpConfig& ttpConfig, KnapsackPtr knapsack, RandomGenerator&& g)
 {
-	return TtpIndividual(ttpConfig, TspSolution::createRandom(ttpConfig, std::forward<RandomGenerator>(g)), std::move(knapsack));
+	return std::make_unique<TtpIndividual>(ttpConfig, TspSolution::createRandom(ttpConfig, std::forward<RandomGenerator>(g)), std::move(knapsack));
 }
 
 } // namespace ttp

@@ -19,12 +19,12 @@ int main()
 		knapsack->fillKnapsack(ttpConfigBase.getConfig());
 		auto rndTtp1 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), knapsack, g);
 		auto rndTtp2 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), knapsack, g);
-		auto fitness1 = rndTtp1.getFitness();
-		auto fitness2 = rndTtp2.getFitness();
-		auto offspring = rndTtp1.crossover(rndTtp2);
-		auto fitnessOfOffspring = offspring.getFitness();
+		auto fitness1 = rndTtp1->evaluate();
+		auto fitness2 = rndTtp2->evaluate();
+		auto offspring = rndTtp1->crossover(*rndTtp2);
+		auto fitnessOfOffspring = offspring.evaluate();
 		offspring.mutation();
-		auto fitnessAfterMut = offspring.getFitness();
+		auto fitnessAfterMut = offspring.evaluate();
 		std::cout << "fitness1: " << fitness1 << std::endl;
 		std::cout << "fitness2: " << fitness2 << std::endl;
 		std::cout << "fitnessOfOffspring: " << fitnessOfOffspring << std::endl;

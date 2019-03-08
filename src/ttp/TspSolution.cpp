@@ -92,7 +92,7 @@ void TspSolution::mutation()
 	std::swap(cityChain[randomGene], cityChain[randomNeighbourIndex]);
 }
 
-TspSolution TspSolution::crossover(const float parent1TotalTime, const TspSolution& parent2, const float parent2TotalTime)
+TspSolution TspSolution::crossover(const float parent1TotalTime, const TspSolution& parent2, const float parent2TotalTime) const
 {
 	// NRX
 	std::map<uint32_t, float> stepsSum;
