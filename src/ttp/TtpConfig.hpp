@@ -15,7 +15,7 @@ struct TtpConfig
 {
 	void fillNearestDistanceLookup()
 	{
-		auto minDistance = std::numeric_limits<float>::infinity();
+		auto minDistance = std::numeric_limits<double>::infinity();
 		for (auto i = 0u; i < cities.size(); i++)
 		{
 			auto nearestIndex = 0u;
@@ -31,7 +31,7 @@ struct TtpConfig
 				}
 			}
 			nearestDistanceLookup[i + 1] = std::make_pair(nearestIndex + 1, minDistance);  // + 1 cause of cities numeration in config
-			minDistance = std::numeric_limits<float>::infinity();
+			minDistance = std::numeric_limits<double>::infinity();
 		}
 	}
 
@@ -40,11 +40,11 @@ struct TtpConfig
 	uint32_t dimenssion;
 	uint32_t itemsNum;
 	uint32_t capacityOfKnapsack;
-	float minVelocity;
-	float maxVelocity;
-	float rentingRatio;
+	double minVelocity;
+	double maxVelocity;
+	double rentingRatio;
 	std::vector<City> cities;
 	std::vector<Item> items;
-	std::unordered_map<uint32_t, std::pair<uint32_t, float>> nearestDistanceLookup;
+	std::unordered_map<uint32_t, std::pair<uint32_t, double>> nearestDistanceLookup;
 };
 } // namespace ttp

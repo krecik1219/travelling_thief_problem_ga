@@ -7,11 +7,12 @@ namespace ttp {
 
 Knapsack::Knapsack(const uint32_t capacity)
 	: capacity(capacity)
-	, currentWeight(0)
+	, currentWeight(0u)
+	, knapsackValue(0u)
 {
 }
 
-const ItemsPerCity & Knapsack::getItemsPerCity() const
+const ItemsPerCity& Knapsack::getItemsPerCity() const
 {
 	return itemsPerCity;
 }
@@ -43,18 +44,42 @@ void Knapsack::fillKnapsack(const TtpConfig& ttpConfig)
 		}
 	}
 	knapsackValue =
-		std::accumulate(itemsPerCity.cbegin(), itemsPerCity.cend(), 0,
+		std::accumulate(itemsPerCity.cbegin(), itemsPerCity.cend(), 0u,
 			[](const auto& acc, const auto& pair)
 			{
-				return acc + std::accumulate(pair.second.cbegin(), pair.second.cend(), 0,
+				return acc + std::accumulate(pair.second.cbegin(), pair.second.cend(), 0u,
 					[](const auto& acc, const auto& item) {return acc + item.profit; });
 			}
 		);
 }
 
-int32_t Knapsack::getKnapsackValue() const
+void Knapsack::clear()
+{
+	itemsPerCity.clear();
+	currentWeight = 0u;
+	knapsackValue = 0u;
+}
+
+void Knapsack::addItem(const Item& item)
+{
+	itemsPerCity[item.cityId].push_back(item);
+	currentWeight += item.weight;
+	knapsackValue += item.profit;
+}
+
+uint32_t Knapsack::getKnapsackValue() const
 {
 	return knapsackValue;
+}
+
+uint32_t Knapsack::getKnapsackCapacity() const
+{
+	return capacity;
+}
+
+uint32_t Knapsack::getCurrentWeight() const
+{
+	return currentWeight;
 }
 
 } // namespace ttp

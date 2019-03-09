@@ -11,10 +11,12 @@ namespace ttp {
 class TspSolution
 {
 public:
-	TspSolution() = delete;
-	TspSolution(const TspSolution& other) = default;
-	TspSolution(TspSolution&& other) = default;
 	TspSolution(const TtpConfig& ttpConfig, std::vector<City>&& cities);
+
+	TspSolution() = delete;
+	TspSolution(const TspSolution&) = default;
+	TspSolution(TspSolution&&) = default;
+	~TspSolution() = default;
 
 	TspSolution& operator=(const TspSolution& other) = delete;
 	TspSolution& operator=(TspSolution&& other) = delete;
@@ -22,13 +24,12 @@ public:
 	template <class RandomGenerator>
 	static TspSolution createRandom(const TtpConfig& ttpConfig, RandomGenerator&& g);
 
-	float getTripTime(const Knapsack& knapsack) const;
-	float getCurrentVelocity(const uint32_t currentWeight) const;
+	const std::vector<ttp::City>& getCityChain() const;
 	uint32_t getStepsNumTo(const uint32_t refCity, const uint32_t cityId) const;
 	uint32_t getIndexOfCityInChain(const uint32_t cityId) const;
 	void mutation();
 
-	TspSolution crossover(const float parent1Fitness, const TspSolution& parent2, const float parent2Fitness) const;
+	TspSolution crossover(const double parent1Fitness, const TspSolution& parent2, const double parent2Fitness) const;
 
 private:
 	const TtpConfig& ttpConfig;

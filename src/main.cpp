@@ -15,16 +15,14 @@ int main()
 	try
 	{
 		auto ttpConfigBase = loader.loadTtpConfig("data/trivial_0.ttp");
-		ttp::KnapsackPtr knapsack = std::make_shared<ttp::Knapsack>(ttpConfigBase.getConfig().capacityOfKnapsack);
-		knapsack->fillKnapsack(ttpConfigBase.getConfig());
-		auto rndTtp1 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), knapsack, g);
-		auto rndTtp2 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), knapsack, g);
+		auto rndTtp1 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), g);
+		auto rndTtp2 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), g);
 		auto fitness1 = rndTtp1->evaluate();
 		auto fitness2 = rndTtp2->evaluate();
 		auto offspring = rndTtp1->crossover(*rndTtp2);
-		auto fitnessOfOffspring = offspring.evaluate();
-		offspring.mutation();
-		auto fitnessAfterMut = offspring.evaluate();
+		auto fitnessOfOffspring = offspring->evaluate();
+		offspring->mutation();
+		auto fitnessAfterMut = offspring->evaluate();
 		std::cout << "fitness1: " << fitness1 << std::endl;
 		std::cout << "fitness2: " << fitness2 << std::endl;
 		std::cout << "fitnessOfOffspring: " << fitnessOfOffspring << std::endl;

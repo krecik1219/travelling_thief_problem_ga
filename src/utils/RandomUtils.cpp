@@ -9,9 +9,16 @@ Random& Random::getInstance()
 	return instance;
 }
 
-uint32_t Random::getRandomInt(const uint32_t min, const uint32_t max)
+uint32_t Random::getRandomUint(const uint32_t min, const uint32_t max)
 {
 	std::uniform_int_distribution<uint32_t>::param_type distParam(min, max);
+	uintDis.param(distParam);
+	return uintDis(gen);
+}
+
+int32_t Random::getRandomInt(const int32_t min, const int32_t max)
+{
+	std::uniform_int_distribution<int32_t>::param_type distParam(min, max);
 	intDis.param(distParam);
 	return intDis(gen);
 }
