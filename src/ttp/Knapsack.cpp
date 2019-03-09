@@ -25,34 +25,6 @@ uint32_t Knapsack::getWeightForCity(const uint32_t cityId) const
 	return std::accumulate(items.cbegin(), items.cend(), 0, [](const auto& acc, const auto& item) {return acc + item.weight; });
 }
 
-void Knapsack::fillKnapsack(const TtpConfig& ttpConfig)
-{
-	// based on profit to weight ratio
-	auto allItems = ttpConfig.items;
-	std::sort(allItems.begin(), allItems.end(),
-		[](const auto& lhs, const auto& rhs)
-		{
-			return lhs.profit / lhs.weight < rhs.profit / rhs.weight;
-		});
-	for (auto rit = allItems.crbegin(); rit != allItems.crend() && currentWeight < capacity; rit++)
-	{
-		auto& item = *rit;
-		if (currentWeight + item.weight <= capacity)
-		{
-			currentWeight += item.weight;
-			itemsPerCity[item.cityId].push_back(std::move(item));
-		}
-	}
-	knapsackValue =
-		std::accumulate(itemsPerCity.cbegin(), itemsPerCity.cend(), 0u,
-			[](const auto& acc, const auto& pair)
-			{
-				return acc + std::accumulate(pair.second.cbegin(), pair.second.cend(), 0u,
-					[](const auto& acc, const auto& item) {return acc + item.profit; });
-			}
-		);
-}
-
 void Knapsack::clear()
 {
 	itemsPerCity.clear();
@@ -80,6 +52,27 @@ uint32_t Knapsack::getKnapsackCapacity() const
 uint32_t Knapsack::getCurrentWeight() const
 {
 	return currentWeight;
+}
+
+std::string Knapsack::getStringRepresentation() const
+{
+	std::string result;
+	const std::string resultDelimiter = " ; ";
+	const std::string subResultDelimiter = ", ";
+	for (const auto& itemsInCity : itemsPerCity)
+	{
+		result.append(std::to_string(itemsInCity.first)).append(": [");
+		std::string subResult;
+		for (const auto& item : itemsInCity.second)
+			subResult.append(std::to_string(item.index)).append(subResultDelimiter);
+		if (!subResult.empty())
+			subResult = subResult.substr(0, subResult.length() - subResultDelimiter.length());
+		result.append(subResult).append("]").append(resultDelimiter);
+	}
+	if (!result.empty())
+		result = result.substr(0, result.length() - resultDelimiter.length());
+	result += "; total profit: " + std::to_string(knapsackValue) + "; total weight: " + std::to_string(currentWeight);
+	return result;
 }
 
 } // namespace ttp

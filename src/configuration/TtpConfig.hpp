@@ -6,10 +6,10 @@
 #include <string>
 #include <vector>
 
-#include "City.hpp"
-#include "Item.hpp"
+#include <ttp/City.hpp>
+#include <ttp/Item.hpp>
 
-namespace ttp {
+namespace config {
 
 struct TtpConfig
 {
@@ -43,8 +43,8 @@ struct TtpConfig
 	double minVelocity;
 	double maxVelocity;
 	double rentingRatio;
-	std::vector<City> cities;
-	std::vector<Item> items;
+	std::vector<ttp::City> cities;
+	std::vector<ttp::Item> items;
 	std::unordered_map<uint32_t, std::pair<uint32_t, double>> nearestDistanceLookup;
 };
-} // namespace ttp
+} // namespace config

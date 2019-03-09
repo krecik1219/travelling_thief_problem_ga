@@ -4,11 +4,11 @@
 
 namespace ttp {
 
-TtpIndividual::TtpIndividual(const TtpConfig& ttpConfig, TspSolution&& tsp)
+TtpIndividual::TtpIndividual(const config::TtpConfig& ttpConfig, TspSolution&& tsp)
 	: ttpConfig(ttpConfig)
 	, tsp(std::move(tsp))
 	, knapsack(ttpConfig.capacityOfKnapsack)
-	, currentFitness()
+	, currentFitness(-std::numeric_limits<double>::infinity())
 	, isCurrentFitnessValid(false)
 {
 }
@@ -103,6 +103,14 @@ std::unique_ptr<TtpIndividual> TtpIndividual::crossover(const TtpIndividual& par
 	auto tripTime2 = static_cast<double>(knapsack.getKnapsackValue()) - parent2.currentFitness;
 	auto offspring = tsp.crossover(tripTime1, parent2.tsp, tripTime2);
 	return std::make_unique<TtpIndividual>(ttpConfig, std::move(offspring));
+}
+
+std::string TtpIndividual::getStringRepresentation() const
+{
+	auto tspStr = tsp.getStringRepresentation();
+	auto knapsackStr = knapsack.getStringRepresentation();
+	return "TSP: " + tspStr + "\n" + "knapsack: " + knapsackStr +
+		"\ntotal time: " + std::to_string(getTripTime()) + "\nfitness: " + std::to_string(currentFitness);
 }
 
 void TtpIndividual::fillKnapsack()

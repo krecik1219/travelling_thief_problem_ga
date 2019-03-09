@@ -1,15 +1,15 @@
 #include "TtpConfigBase.hpp"
 
-namespace ttp {
+namespace config {
 
 TtpConfigBase::TtpConfigBase(TtpConfig && ttpConfig)
 	: ttpConfig(std::move(ttpConfig))
 {
 }
 
-const TtpConfig& ttp::TtpConfigBase::getConfig() const
+const config::TtpConfig& TtpConfigBase::getConfig() const
 {
 	return ttpConfig;
 }
 
-} // namespace ttp
+} // namespace config

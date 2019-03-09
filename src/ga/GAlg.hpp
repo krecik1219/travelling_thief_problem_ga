@@ -1,11 +1,15 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <numeric>
 #include <vector>
 
 #include <utils/RandomUtils.hpp>
+#include <logger/Logger.hpp>
+#include <configuration/GAlgConfig.hpp>
 
 
 namespace ga {
@@ -13,21 +17,13 @@ namespace ga {
 using SteadyClock = std::chrono::steady_clock;
 using Tp = std::chrono::time_point<SteadyClock>;
 
-struct GAlgParams
-{
-	uint32_t populationSize;
-	uint32_t tournamentSize;
-	uint32_t maxPopulationsNum;  // 0 indicates no populations num limit
-	std::chrono::seconds maxGAlgDuration;  // 0s indicates no time limit
-	double crossoverProb;
-	double mutationProb;
-};
-
 template <class Individual>
 class GAlg
 {
 public:
-	explicit GAlg(const GAlgParams& params);
+	using IndividualPtr = std::unique_ptr<Individual>;
+
+	GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun, logging::Logger& logger);
 
 	GAlg() = delete;
 	GAlg(const GAlg&) = delete;
@@ -35,13 +31,12 @@ public:
 	~GAlg() = default;
 
 	GAlg& operator=(const GAlg&) = delete;
-	GAlg& operatoe=(GAlg&&) = delete;
+	GAlg& operator=(GAlg&&) = delete;
 
 	void run();
+	IndividualPtr getBestIndividual() const;
 
 private:
-
-	using IndividualPtr = std::unique_ptr<Individual>;
 
 	void initialize();
 	void evaluate();
@@ -49,6 +44,8 @@ private:
 	void selection();
 	Individual& selectParent();
 	void insertToNextPopulation(const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& nextPopulation);
+	void proceedWithOneParentInsertion(const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& nextPopulation);
+	void proceedWithBothParentsInsertion(const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& nextPopulation);
 	void followWithMutation(Individual& individual);
 	bool checkStopConditions();
 
@@ -56,21 +53,24 @@ private:
 	bool populationsNumStopCondition();
 	void setBestIndividualSoFar();
 
-	GAlgParams params;
+	void logState() const;
+
+	config::GAlgParams params;
 	std::function<IndividualPtr(void)> createRandomFun;
 
 	std::vector<IndividualPtr> population;
 	IndividualPtr bestIndividualSoFar;
-
-
+	logging::Logger& logger;
 	Tp startTimestamp;
-	uint32_t populatiosnNum;
+	uint32_t populationsNum;
 };
 
 template<class Individual>
-inline GAlg<Individual>::GAlg(const GAlgParams & params)
+GAlg<Individual>::GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun, logging::Logger& logger)
 	: params(params)
-	, populatiosnNum(0)
+	, createRandomFun(std::move(createRandomFun))
+	, logger(logger)
+	, populationsNum(0)
 {
 	population.reserve(params.populationSize);
 }
@@ -82,7 +82,14 @@ void GAlg<Individual>::run()
 	initialize();
 	evaluate();
 	setBestIndividualSoFar();
+	logState();
 	gaLoop();
+}
+
+template<class Individual>
+typename GAlg<Individual>::IndividualPtr GAlg<Individual>::getBestIndividual() const
+{
+	return std::make_unique<Individual>(*bestIndividualSoFar);
 }
 
 template<class Individual>
@@ -93,9 +100,9 @@ void GAlg<Individual>::initialize()
 }
 
 template<class Individual>
-inline void GAlg<Individual>::evaluate()
+void GAlg<Individual>::evaluate()
 {
-	std::for_each(popualtion.begin(), population.end(), [](auto& individual) {individual->evaluate(); });
+	std::for_each(population.begin(), population.end(), [](auto& individual) {individual->evaluate(); });
 }
 
 template<class Individual>
@@ -104,11 +111,10 @@ void GAlg<Individual>::gaLoop()
 	while (!checkStopConditions())
 	{
 		selection();
-		crossover();
-		mutation();
 		evaluate();
 		populationsNum++;
 		setBestIndividualSoFar();
+		logState();
 	}
 }
 
@@ -117,7 +123,6 @@ void GAlg<Individual>::selection()
 {
 	std::vector<IndividualPtr> nextPopulation;
 	nextPopulation.reserve(params.populationSize);
-	auto& random = utils::rnd::Random::getInstance();
 	while(nextPopulation.size() != params.populationSize)
 	{
 		const Individual& parent1 = selectParent();
@@ -140,13 +145,39 @@ void GAlg<Individual>::insertToNextPopulation(const Individual& parent1, const I
 	}
 	else
 	{
-		auto individual1 = std::make_unique<Individual>(parent1);
-		auto individual2 = std::make_unique<Individual>(parent2);
-		followWithMutation(*individual1);
-		followWithMutation(*individual2);
-		nextPopulation.push_back(std::move(individual1));
-		nextPopulation.push_back(std::move(individual2));
+		if (nextPopulation.size() == params.populationSize - 1)
+			proceedWithOneParentInsertion(parent1, parent2, nextPopulation);
+		else
+			proceedWithBothParentsInsertion(parent1, parent2, nextPopulation);
+
 	}
+}
+
+template<class Individual>
+void GAlg<Individual>::proceedWithOneParentInsertion(
+	const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& nextPopulation)
+{
+	auto& random = utils::rnd::Random::getInstance();
+	auto rndVal = random.getRandomDouble(0.0, 1.0);
+	std::unique_ptr<Individual> individual = nullptr;
+	if(rndVal < 0.5)
+		individual = std::make_unique<Individual>(parent1);
+	else
+		individual = std::make_unique<Individual>(parent2);
+	followWithMutation(*individual);
+	nextPopulation.push_back(std::move(individual));
+}
+
+template<class Individual>
+void GAlg<Individual>::proceedWithBothParentsInsertion(
+	const Individual & parent1, const Individual & parent2, std::vector<IndividualPtr>& nextPopulation)
+{
+	auto individual1 = std::make_unique<Individual>(parent1);
+	auto individual2 = std::make_unique<Individual>(parent2);
+	followWithMutation(*individual1);
+	followWithMutation(*individual2);
+	nextPopulation.push_back(std::move(individual1));
+	nextPopulation.push_back(std::move(individual2));
 }
 
 template<class Individual>
@@ -162,6 +193,7 @@ template<class Individual>
 Individual& GAlg<Individual>::selectParent()
 {
 	// tournament
+	auto& random = utils::rnd::Random::getInstance();
 	std::vector<Individual*> tournamentBatch;
 	tournamentBatch.reserve(params.tournamentSize);
 	for (auto j = 0u; j < params.tournamentSize; j++)
@@ -171,7 +203,7 @@ Individual& GAlg<Individual>::selectParent()
 	}
 	auto tournamentWinnerIt =
 		std::max_element(tournamentBatch.cbegin(), tournamentBatch.cend(),
-			[](const auto& lhs, const auto& rhs) {lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
+			[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
 	return **tournamentWinnerIt;
 }
 
@@ -184,22 +216,49 @@ bool GAlg<Individual>::checkStopConditions()
 template<class Individual>
 bool GAlg<Individual>::timeStopCondition()
 {
+	if (params.maxGAlgDuration == 0s)
+		return false;
 	return SteadyClock::now() - startTimestamp >= params.maxGAlgDuration;
 }
 
 template<class Individual>
 bool GAlg<Individual>::populationsNumStopCondition()
 {
-	return populatiosnNum >= params.maxPopulationsNum;
+	if (params.maxPopulationsNum == 0)
+		return false;
+	return populationsNum >= params.maxPopulationsNum;
 }
 
 template<class Individual>
 void GAlg<Individual>::setBestIndividualSoFar()
 {
 	auto bestIndividualIt =
-		std::max_element(tournamentBatch.cbegin(), tournamentBatch.cend(),
-			[](const auto& lhs, const auto& rhs) {lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
-	bestIndividualSoFar = std::make_unique(**bestIndividualIt);
+		std::max_element(population.cbegin(), population.cend(),
+			[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
+	if (bestIndividualSoFar == nullptr)
+	{
+		bestIndividualSoFar = std::make_unique<Individual>(**bestIndividualIt);
+	}
+	else
+	{
+		const auto best = std::max((*bestIndividualIt).get(), bestIndividualSoFar.get(),
+			[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
+		if (best != bestIndividualSoFar.get())
+			bestIndividualSoFar = std::make_unique<Individual>(*best);
+	}
+}
+
+template<class Individual>
+void GAlg<Individual>::logState() const
+{
+	auto bestWorstIterators = std::minmax_element(population.cbegin(), population.cend(),
+		[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
+	auto bestCurrentFitness = (*bestWorstIterators.second)->getCurrentFitness();
+	auto worstCurrentFitness = (*bestWorstIterators.first)->getCurrentFitness();
+	double sumOfFitnesses = std::accumulate(population.cbegin(), population.cend(), 0.0,
+		[](const auto& acc, const auto& individual) {return acc + individual->getCurrentFitness(); });
+	auto avgFitness = sumOfFitnesses / population.size();
+	logger.log("%d, %.4f, %.4f, %.4f", populationsNum, bestCurrentFitness, avgFitness, worstCurrentFitness);
 }
 
 } // namespace ga

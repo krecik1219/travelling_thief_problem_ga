@@ -9,7 +9,7 @@ namespace ttp {
 class TtpIndividual
 {
 public:
-	TtpIndividual(const TtpConfig& ttpConfig, TspSolution&& tsp);
+	TtpIndividual(const config::TtpConfig& ttpConfig, TspSolution&& tsp);
 
 	TtpIndividual() = delete;
 	TtpIndividual(const TtpIndividual&) = default;
@@ -21,7 +21,7 @@ public:
 	TtpIndividual& operator=(TtpIndividual&&) = delete;
 
 	template <class RandomGenerator>
-	static std::unique_ptr<TtpIndividual> createRandom(const TtpConfig& ttpConfig, RandomGenerator&& g);
+	static std::unique_ptr<TtpIndividual> createRandom(const config::TtpConfig& ttpConfig, RandomGenerator&& g);
 
 	double getTripTime() const;
 	double getTripTime(const uint32_t startCityPos, const uint32_t weight) const;
@@ -30,13 +30,14 @@ public:
 	double evaluate();
 	void mutation();
 	std::unique_ptr<TtpIndividual> crossover(const TtpIndividual& parent2) const;
+	std::string getStringRepresentation() const;
 
 private:
 	double computeFitness();
 	double computeAndSetFitness();
 	void fillKnapsack();
 
-	const TtpConfig& ttpConfig;
+	const config::TtpConfig& ttpConfig;
 	TspSolution tsp;
 	Knapsack knapsack;
 	double currentFitness;
@@ -44,7 +45,7 @@ private:
 };
 
 template <class RandomGenerator>
-std::unique_ptr<TtpIndividual> TtpIndividual::createRandom(const TtpConfig& ttpConfig, RandomGenerator&& g)
+std::unique_ptr<TtpIndividual> TtpIndividual::createRandom(const config::TtpConfig& ttpConfig, RandomGenerator&& g)
 {
 	return std::make_unique<TtpIndividual>(ttpConfig, TspSolution::createRandom(ttpConfig, std::forward<RandomGenerator>(g)));
 }

@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "Item.hpp"
-#include "TtpConfig.hpp"
+#include <configuration/TtpConfig.hpp>
 
 namespace ttp {
 
@@ -25,12 +25,13 @@ public:
 
 	const ItemsPerCity& getItemsPerCity() const;
 	uint32_t getWeightForCity(const uint32_t cityId) const;
-	void fillKnapsack(const TtpConfig& ttpConfig);
+	void fillKnapsack(const config::TtpConfig& ttpConfig);
 	void clear();
 	void addItem(const Item& item);
 	uint32_t getKnapsackValue() const;
 	uint32_t getKnapsackCapacity() const;
 	uint32_t getCurrentWeight() const;
+	std::string getStringRepresentation() const;
 
 private:
 	const uint32_t capacity;

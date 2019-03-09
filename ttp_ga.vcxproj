@@ -72,6 +72,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -107,13 +110,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -121,25 +125,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\configuration\GAlgConfigBase.cpp" />
+    <ClCompile Include="src\configuration\TtpConfigBase.cpp" />
+    <ClCompile Include="src\loader\GAlgConfigLoader.cpp" />
+    <ClCompile Include="src\logger\Logger.cpp" />
     <ClCompile Include="src\loader\InstanceLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ttp\Knapsack.cpp" />
     <ClCompile Include="src\ttp\TspSolution.cpp" />
-    <ClCompile Include="src\ttp\TtpConfigBase.cpp" />
     <ClCompile Include="src\ttp\TtpIndividual.cpp" />
     <ClCompile Include="src\utils\RandomUtils.cpp" />
     <ClCompile Include="src\utils\StringUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\configuration\GAlgConfig.hpp" />
+    <ClInclude Include="src\configuration\GAlgConfigBase.hpp" />
+    <ClInclude Include="src\configuration\TtpConfig.hpp" />
+    <ClInclude Include="src\configuration\TtpConfigBase.hpp" />
     <ClInclude Include="src\ga\GAlg.hpp" />
+    <ClInclude Include="src\loader\GAlgConfigLoader.hpp" />
+    <ClInclude Include="src\logger\Logger.hpp" />
     <ClInclude Include="src\loader\ConfigParsingException.hpp" />
     <ClInclude Include="src\loader\InstanceLoader.hpp" />
     <ClInclude Include="src\ttp\City.hpp" />
     <ClInclude Include="src\ttp\Item.hpp" />
     <ClInclude Include="src\ttp\Knapsack.hpp" />
     <ClInclude Include="src\ttp\TspSolution.hpp" />
-    <ClInclude Include="src\ttp\TtpConfig.hpp" />
-    <ClInclude Include="src\ttp\TtpConfigBase.hpp" />
     <ClInclude Include="src\ttp\TtpIndividual.hpp" />
     <ClInclude Include="src\utils\RandomUtils.hpp" />
     <ClInclude Include="src\utils\StringUtils.hpp" />

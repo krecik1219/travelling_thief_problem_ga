@@ -5,20 +5,19 @@
 #include <fstream>
 #include <sstream>
 
-#include <ttp/TtpConfig.hpp>
 #include <utils/StringUtils.hpp>
 #include "ConfigParsingException.hpp"
 
 namespace loader
 {
 
-ttp::TtpConfigBase InstanceLoader::loadTtpConfig(const std::string& filePath) const
+config::TtpConfigBase InstanceLoader::loadTtpConfig(const std::string& filePath) const
 {
 	std::ifstream fileHandle(filePath);
 	if (!fileHandle.is_open())
 		throw std::runtime_error("Could not read file: " + filePath);
 
-	ttp::TtpConfig ttpConfig;
+	config::TtpConfig ttpConfig;
 	std::string line;
 	ReadingType readingType = ReadingType::city;
 	while (std::getline(fileHandle, line))
@@ -27,10 +26,10 @@ ttp::TtpConfigBase InstanceLoader::loadTtpConfig(const std::string& filePath) co
 	}
 
 	ttpConfig.fillNearestDistanceLookup();
-	return ttp::TtpConfigBase(std::move(ttpConfig));
+	return config::TtpConfigBase(std::move(ttpConfig));
 }
 
-void InstanceLoader::decideWhatToDoWithLine(const std::string& line, ReadingType& readingType, ttp::TtpConfig& ttpConfig) const
+void InstanceLoader::decideWhatToDoWithLine(const std::string& line, ReadingType& readingType, config::TtpConfig& ttpConfig) const
 {
 	if (line.find("PROBLEM NAME:") != std::string::npos)
 	{
@@ -60,17 +59,17 @@ void InstanceLoader::decideWhatToDoWithLine(const std::string& line, ReadingType
 	else if (line.find("MIN SPEED:") != std::string::npos)
 	{
 		auto value = prepareValueToStore(line);
-		ttpConfig.minVelocity = std::stof(value);
+		ttpConfig.minVelocity = std::stod(value);
 	}
 	else if (line.find("MAX SPEED:") != std::string::npos)
 	{
 		auto value = prepareValueToStore(line);
-		ttpConfig.maxVelocity = std::stof(value);
+		ttpConfig.maxVelocity = std::stod(value);
 	}
 	else if (line.find("RENTING RATIO:") != std::string::npos)
 	{
 		auto value = prepareValueToStore(line);
-		ttpConfig.rentingRatio = std::stof(value);
+		ttpConfig.rentingRatio = std::stod(value);
 	}
 	else if (line.find("NODE_COORD_SECTION") != std::string::npos)
 	{
@@ -103,7 +102,7 @@ std::string InstanceLoader::prepareValueToStore(const std::string& s) const
 	return value;
 }
 
-void InstanceLoader::storeCityData(const std::string & line, ttp::TtpConfig& ttpConfig) const
+void InstanceLoader::storeCityData(const std::string & line, config::TtpConfig& ttpConfig) const
 {
 	std::istringstream ss(line);
 	std::string token;
@@ -122,10 +121,10 @@ void InstanceLoader::storeCityData(const std::string & line, ttp::TtpConfig& ttp
 		throw ConfigParsingException("Parsing city data - bad file structure: " + line);
 	}
 	auto index = static_cast<uint32_t>(std::stoi(tokens[0]));
-	ttpConfig.cities.emplace_back(ttp::City{ index, std::stof(tokens[1]), std::stof(tokens[2]) });
+	ttpConfig.cities.emplace_back(ttp::City{ index, std::stod(tokens[1]), std::stod(tokens[2]) });
 }
 
-void InstanceLoader::storeItemData(const std::string & line, ttp::TtpConfig& ttpConfig) const
+void InstanceLoader::storeItemData(const std::string & line, config::TtpConfig& ttpConfig) const
 {
 	std::istringstream ss(line);
 	std::string token;
