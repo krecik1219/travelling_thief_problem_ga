@@ -41,10 +41,30 @@ void GAlgConfigLoader::decideWhatToDoWithLine(const std::string& line, config::G
 		auto value = prepareValueToStore(line);
 		gAlgConfig.bestIndividualResultFile = value;
 	}
+	else if (line.find("BEST GREEDY ALG PATH:") != std::string::npos)
+	{
+		auto value = prepareValueToStore(line);
+		gAlgConfig.bestGreedyAlgPath = value;
+	}
+	else if (line.find("BEST RANDOM ALG PATH:") != std::string::npos)
+	{
+		auto value = prepareValueToStore(line);
+		gAlgConfig.bestRandomAlgPath = value;
+	}
+	else if (line.find("NAIVE REPETITIONS:") != std::string::npos)
+	{
+		auto value = prepareValueToStore(line);
+		gAlgConfig.naiveRepetitions = std::stoi(value);
+	}
 	else if (line.find("POPULATION SIZE:") != std::string::npos)
 	{
 		auto value = prepareValueToStore(line);
 		gAlgConfig.gAlgParams.populationSize = std::stoi(value);
+	}
+	else if (line.find("SELECTION STRATEGY:") != std::string::npos)
+	{
+		auto value = prepareValueToStore(line);
+		gAlgConfig.gAlgParams.selectionStrategy = value;
 	}
 	else if (line.find("TOURNAMENT SIZE:") != std::string::npos)
 	{

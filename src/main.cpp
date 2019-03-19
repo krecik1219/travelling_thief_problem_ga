@@ -9,6 +9,8 @@
 #include <ttp/Knapsack.hpp>
 #include <ga/GAlg.hpp>
 #include <logger/Logger.hpp>
+#include <naive/GreedyAlg.hpp>
+#include <naive/RandomSelectionAlg.hpp>
 
 using namespace std::chrono_literals;
 
@@ -37,19 +39,16 @@ int main()
 
 		logger2.log("%s", bestIndividual->getStringRepresentation().c_str());
 
-		//auto rndTtp1 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), g);
-		//auto rndTtp2 = ttp::TtpIndividual::createRandom(ttpConfigBase.getConfig(), g);
-		//auto fitness1 = rndTtp1->evaluate();
-		//auto fitness2 = rndTtp2->evaluate();
-		//auto offspring = rndTtp1->crossover(*rndTtp2);
-		//auto fitnessOfOffspring = offspring->evaluate();
-		//offspring->mutation();
-		//auto fitnessAfterMut = offspring->evaluate();
-		//std::cout << "fitness1: " << fitness1 << std::endl;
-		//std::cout << "fitness2: " << fitness2 << std::endl;
-		//std::cout << "fitnessOfOffspring: " << fitnessOfOffspring << std::endl;
-		//std::cout << "fitnessAfterMut: " << fitnessAfterMut << std::endl;
-		//std::cout << "random created" << std::endl;
+
+		logging::Logger logger3(gAlgConfig.bestGreedyAlgPath);
+		naive::GreedyAlg<ttp::TtpIndividual> greedyAlg(gAlgConfig.naiveRepetitions, ttpConfig);
+		auto bestFromGreedy = greedyAlg.executeAlg();
+		logger3.log("%s", bestFromGreedy->getStringRepresentation().c_str());
+
+		logging::Logger logger4(gAlgConfig.bestRandomAlgPath);
+		naive::RandomSelectionAlg<ttp::TtpIndividual> rndAlg(gAlgConfig.naiveRepetitions, createRandomFun);
+		auto bestFromRandom = rndAlg.executeAlg();
+		logger4.log("%s", bestFromRandom->getStringRepresentation().c_str());
 	}
 	catch (loader::ConfigParsingException& e)
 	{

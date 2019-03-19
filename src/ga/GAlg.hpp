@@ -10,6 +10,9 @@
 #include <utils/RandomUtils.hpp>
 #include <logger/Logger.hpp>
 #include <configuration/GAlgConfig.hpp>
+#include "selection/SelectionStrategy.hpp"
+#include "selection/TournamentStrategy.hpp"
+#include "selection/RouletteWheelStrategy.hpp"
 
 
 namespace ga {
@@ -42,12 +45,12 @@ private:
 	void evaluate();
 	void gaLoop();
 	void selection();
-	Individual& selectParent();
 	void insertToNextPopulation(const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& nextPopulation);
 	void proceedWithOneParentInsertion(const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& nextPopulation);
 	void proceedWithBothParentsInsertion(const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& nextPopulation);
 	void followWithMutation(Individual& individual);
 	bool checkStopConditions();
+	std::unique_ptr<SelectionStrategy<Individual>> makeSelectionStrategy() const;
 
 	bool timeStopCondition();
 	bool populationsNumStopCondition();
@@ -57,6 +60,8 @@ private:
 
 	config::GAlgParams params;
 	std::function<IndividualPtr(void)> createRandomFun;
+
+	std::unique_ptr<SelectionStrategy<Individual>> selectionStrategy;
 
 	std::vector<IndividualPtr> population;
 	IndividualPtr bestIndividualSoFar;
@@ -69,6 +74,7 @@ template<class Individual>
 GAlg<Individual>::GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun, logging::Logger& logger)
 	: params(params)
 	, createRandomFun(std::move(createRandomFun))
+	, selectionStrategy(makeSelectionStrategy())
 	, logger(logger)
 	, populationsNum(0)
 {
@@ -125,8 +131,8 @@ void GAlg<Individual>::selection()
 	nextPopulation.reserve(params.populationSize);
 	while(nextPopulation.size() != params.populationSize)
 	{
-		const Individual& parent1 = selectParent();
-		const Individual& parent2 = selectParent();
+		const Individual& parent1 = selectionStrategy->selectParent(population);
+		const Individual& parent2 = selectionStrategy->selectParent(population);
 		insertToNextPopulation(parent1, parent2, nextPopulation);
 	}
 	population = std::move(nextPopulation);
@@ -190,27 +196,20 @@ void GAlg<Individual>::followWithMutation(Individual& individual)
 }
 
 template<class Individual>
-Individual& GAlg<Individual>::selectParent()
-{
-	// tournament
-	auto& random = utils::rnd::Random::getInstance();
-	std::vector<Individual*> tournamentBatch;
-	tournamentBatch.reserve(params.tournamentSize);
-	for (auto j = 0u; j < params.tournamentSize; j++)
-	{
-		auto individualIndex = random.getRandomUint(0, params.populationSize - 1);
-		tournamentBatch.push_back(population[individualIndex].get());
-	}
-	auto tournamentWinnerIt =
-		std::max_element(tournamentBatch.cbegin(), tournamentBatch.cend(),
-			[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
-	return **tournamentWinnerIt;
-}
-
-template<class Individual>
 bool GAlg<Individual>::checkStopConditions()
 {
 	return populationsNumStopCondition() || timeStopCondition();
+}
+
+template<class Individual>
+std::unique_ptr<SelectionStrategy<Individual>> GAlg<Individual>::makeSelectionStrategy() const
+{
+	if (params.selectionStrategy == "tournament")
+		return std::make_unique<TournamentStrategy<Individual>>(params.tournamentSize);
+	else if (params.selectionStrategy == "roulette")
+		return std::make_unique<RouletteWheelStrategy<Individual>>();
+	else
+		throw std::runtime_error("Provided selection strategy name: " + params.selectionStrategy + " not matching any available strategy");
 }
 
 template<class Individual>

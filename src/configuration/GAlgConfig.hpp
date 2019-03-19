@@ -9,7 +9,8 @@ namespace config {
 struct GAlgParams
 {
 	uint32_t populationSize;
-	uint32_t tournamentSize;
+	std::string selectionStrategy;
+	uint32_t tournamentSize;  // matters when selectionStrategy == "tournament"
 	uint32_t maxPopulationsNum;  // 0 indicates no populations num limit
 	std::chrono::seconds maxGAlgDuration;  // 0s indicates no time limit
 	double crossoverProb;
@@ -22,6 +23,9 @@ struct GAlgConfig
 	std::string instanceFilePath;
 	std::string resultsCsvFile;
 	std::string bestIndividualResultFile;
+	std::string bestGreedyAlgPath;
+	std::string bestRandomAlgPath;
+	uint32_t naiveRepetitions;
 };
 
 } // namespace config
