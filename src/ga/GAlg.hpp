@@ -145,7 +145,7 @@ void GAlg<Individual>::insertToNextPopulation(const Individual& parent1, const I
 	auto crossoverRnd = random.getRandomDouble(0.0, 1.0);
 	if (crossoverRnd <= params.crossoverProb)
 	{
-		auto offspring = parent1.crossover(parent2);
+		auto offspring = parent1.crossoverNrx(parent2);
 		followWithMutation(*offspring);
 		nextPopulation.push_back(std::move(offspring));
 	}
@@ -155,8 +155,22 @@ void GAlg<Individual>::insertToNextPopulation(const Individual& parent1, const I
 			proceedWithOneParentInsertion(parent1, parent2, nextPopulation);
 		else
 			proceedWithBothParentsInsertion(parent1, parent2, nextPopulation);
-
 	}
+
+	//auto& random = utils::rnd::Random::getInstance();
+	//auto crossoverRnd = random.getRandomDouble(0.0, 1.0);
+	//if (crossoverRnd <= params.crossoverProb)
+	//{
+	//	auto [offspring1, offspring2] = parent1.crossoverPmx(parent2);
+	//	followWithMutation(*offspring1);
+	//	nextPopulation.push_back(std::move(offspring1));
+	//	followWithMutation(*offspring2);
+	//	nextPopulation.push_back(std::move(offspring2));
+	//}
+	//else
+	//{
+	//	proceedWithBothParentsInsertion(parent1, parent2, nextPopulation);
+	//}
 }
 
 template<class Individual>

@@ -29,11 +29,15 @@ public:
 	uint32_t getStepsNumTo(const uint32_t refCity, const uint32_t cityId) const;
 	uint32_t getIndexOfCityInChain(const uint32_t cityId) const;
 	void mutation();
-	TspSolution crossover(const double parent1Fitness, const TspSolution& parent2, const double parent2Fitness) const;
+	TspSolution crossoverNrx(const double parent1Fitness, const TspSolution& parent2, const double parent2Fitness) const;
+	std::pair<TspSolution, TspSolution> crossoverPmx(const TspSolution& parent2) const;
 	std::string getStringRepresentation() const;
 
 
 private:
+	std::vector<City> pmx(const TspSolution& parent1,
+		const TspSolution& parent2, const uint32_t partitionIndex1, const uint32_t partitionIndex2) const;
+
 	const config::TtpConfig& ttpConfig;
 	std::vector<ttp::City> cityChain;
 };

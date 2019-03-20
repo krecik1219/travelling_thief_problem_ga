@@ -6,6 +6,10 @@
 
 namespace ttp {
 
+class TtpIndividual;
+
+using OffspringsPtrsPair = std::pair<std::unique_ptr<TtpIndividual>, std::unique_ptr<TtpIndividual>>;
+
 class TtpIndividual
 {
 public:
@@ -29,7 +33,8 @@ public:
 	double getCurrentFitness() const;
 	double evaluate();
 	void mutation();
-	std::unique_ptr<TtpIndividual> crossover(const TtpIndividual& parent2) const;
+	std::unique_ptr<TtpIndividual> crossoverNrx(const TtpIndividual& parent2) const;
+	OffspringsPtrsPair crossoverPmx(const TtpIndividual& parent2) const;
 	std::string getStringRepresentation() const;
 
 private:

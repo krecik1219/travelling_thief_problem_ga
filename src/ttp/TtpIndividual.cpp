@@ -1,6 +1,7 @@
 #include "TtpIndividual.hpp"
 
 #include <memory>
+#include <utility>
 
 namespace ttp {
 
@@ -97,12 +98,21 @@ void TtpIndividual::mutation()
 	isCurrentFitnessValid = false;
 }
 
-std::unique_ptr<TtpIndividual> TtpIndividual::crossover(const TtpIndividual& parent2) const
+std::unique_ptr<TtpIndividual> TtpIndividual::crossoverNrx(const TtpIndividual& parent2) const
 {
 	auto tripTime1 = static_cast<double>(knapsack.getKnapsackValue()) - currentFitness;
 	auto tripTime2 = static_cast<double>(knapsack.getKnapsackValue()) - parent2.currentFitness;
-	auto offspring = tsp.crossover(tripTime1, parent2.tsp, tripTime2);
+	auto offspring = tsp.crossoverNrx(tripTime1, parent2.tsp, tripTime2);
 	return std::make_unique<TtpIndividual>(ttpConfig, std::move(offspring));
+}
+
+OffspringsPtrsPair TtpIndividual::crossoverPmx(const TtpIndividual& parent2) const
+{
+	auto [offspringTsp1, offspringTsp2] = tsp.crossoverPmx(parent2.tsp);
+	return std::make_pair(
+		std::make_unique<TtpIndividual>(ttpConfig, std::move(offspringTsp1)),
+		std::make_unique<TtpIndividual>(ttpConfig, std::move(offspringTsp2))
+	);
 }
 
 std::string TtpIndividual::getStringRepresentation() const
@@ -133,7 +143,10 @@ void TtpIndividual::fillKnapsack()
 	fitnessUtilization.reserve(ttpConfig.items.size());
 	for (const auto& item : ttpConfig.items)
 	{
-		auto timeFromCityWithOneItem = getTripTime(item.cityId, item.weight);
+		//auto timeFromCityWithOneItem = getTripTime(item.cityId, item.weight);
+		double velocity =
+			knapsack.getCurrentWeight() + item.weight >= knapsack.getKnapsackCapacity() ? ttpConfig.minVelocity : getCurrentVelocity(item.weight);
+		auto timeFromCityWithOneItem = totalTravelingDistanceFromCityWihId[item.cityId] / velocity;
 		auto totalTimeWithOneItem =
 			(totalTravelingDistanceFromCityWihId[cities[0].index] - totalTravelingDistanceFromCityWihId[item.cityId]) / ttpConfig.maxVelocity +
 			timeFromCityWithOneItem;
