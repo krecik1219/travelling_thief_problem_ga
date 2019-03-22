@@ -27,6 +27,8 @@ TournamentStrategy<Individual>::TournamentStrategy(const uint32_t tournamentSize
 	: SelectionStrategy<Individual>()
 	, tournamentSize(tournamentSize)
 {
+	if (tournamentSize == 0)
+		throw std::runtime_error("Tournament size can't be 0");
 }
 
 template<class Individual>
