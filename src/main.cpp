@@ -14,8 +14,11 @@
 
 using namespace std::chrono_literals;
 
-int main()
+int main(int argc, char **argv)
 {
+	std::string suffix;
+	if (argc == 2)
+		suffix = std::string(argv[1]);
 	std::random_device rd;
 	std::mt19937 g(rd());
 	std::cout << "starting" << std::endl;
@@ -28,24 +31,24 @@ int main()
 		auto ttpConfigBase = instanceLoader.loadTtpConfig(gAlgConfig.instanceFilePath);
 		auto ttpConfig = ttpConfigBase.getConfig();
 		auto createRandomFun = [&ttpConfig, &g]() {return ttp::TtpIndividual::createRandom(ttpConfig, g); };
-		logging::Logger logger(gAlgConfig.resultsCsvFile);
+		logging::Logger logger(gAlgConfig.resultsCsvFile + suffix);
 		ga::GAlg<ttp::TtpIndividual> gAlg(gAlgConfig.gAlgParams, createRandomFun, logger);
 
 		gAlg.run();
 
-		logging::Logger logger2(gAlgConfig.bestIndividualResultFile);
+		logging::Logger logger2(gAlgConfig.bestIndividualResultFile + suffix);
 
 		auto bestIndividual = gAlg.getBestIndividual();
 
 		logger2.log("%s", bestIndividual->getStringRepresentation().c_str());
 
 
-		logging::Logger logger3(gAlgConfig.bestGreedyAlgPath);
+		logging::Logger logger3(gAlgConfig.bestGreedyAlgPath + suffix);
 		naive::GreedyAlg<ttp::TtpIndividual> greedyAlg(gAlgConfig.naiveRepetitions, ttpConfig);
 		auto bestFromGreedy = greedyAlg.executeAlg();
 		logger3.log("%s", bestFromGreedy->getStringRepresentation().c_str());
 
-		logging::Logger logger4(gAlgConfig.bestRandomAlgPath);
+		logging::Logger logger4(gAlgConfig.bestRandomAlgPath + suffix);
 		naive::RandomSelectionAlg<ttp::TtpIndividual> rndAlg(gAlgConfig.naiveRepetitions, createRandomFun);
 		auto bestFromRandom = rndAlg.executeAlg();
 		logger4.log("%s", bestFromRandom->getStringRepresentation().c_str());

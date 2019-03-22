@@ -1,14 +1,14 @@
-INSTANCE CONFIG PATH:   data/hard_0.ttp
-RESULTS CSV FILE:   results/hard_0/result.csv
-BEST INDIVIDUAL RESULT FILE:    results/hard_0/best.txt
-BEST GREEDY ALG PATH:    results/hard_0/greedy_best.txt
-BEST RANDOM ALG PATH:    results/hard_0/random_best.txt
+INSTANCE CONFIG PATH:   data/hard_1.ttp
+RESULTS CSV FILE:   results/hard_1/result.csv
+BEST INDIVIDUAL RESULT FILE:    results/hard_1/best.txt
+BEST GREEDY ALG PATH:    results/hard_1/greedy_best.txt
+BEST RANDOM ALG PATH:    results/hard_1/random_best.txt
 NAIVE REPETITIONS:    10
-POPULATION SIZE:    1000
+POPULATION SIZE:    10000
 SELECTION STRATEGY:    tournament
-TOURNAMENT SIZE:    10
+TOURNAMENT SIZE:    700
 MAX GENERATIONS NUM:    100
 MAX ALG SECONDS DURATION:   0
-CROSSOVER PROBABILITY:  0.3
+CROSSOVER PROBABILITY:  0.25
 MUTATION PROBABILITY:   0.55
 
