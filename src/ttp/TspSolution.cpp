@@ -65,7 +65,8 @@ uint32_t TspSolution::getIndexOfCityInChain(const uint32_t cityId) const
 void TspSolution::mutation()
 {
 	// IRGIBNNM
-	const int32_t neighbourhoodThreshold = static_cast<int32_t>(cityChain.size()) / 4;
+	//const int32_t neighbourhoodThreshold = static_cast<int32_t>(cityChain.size()) / 100 + 1;
+	const int32_t neighbourhoodThreshold = 5;
 	auto& random = utils::rnd::Random::getInstance();
 	auto lastIndexInChain = static_cast<int32_t>(cityChain.size() - 1);
 	auto first = random.getRandomUint(0, lastIndexInChain);

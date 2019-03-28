@@ -25,7 +25,6 @@ public:
 
 	const ItemsPerCity& getItemsPerCity() const;
 	uint32_t getWeightForCity(const uint32_t cityId) const;
-	void fillKnapsack(const config::TtpConfig& ttpConfig);
 	void clear();
 	void addItem(const Item& item);
 	uint32_t getKnapsackValue() const;

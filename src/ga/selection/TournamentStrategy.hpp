@@ -36,17 +36,23 @@ const Individual& TournamentStrategy<Individual>::selectParent(const std::vector
 {
 	// tournament
 	auto& random = utils::rnd::Random::getInstance();
-	std::vector<Individual*> tournamentBatch;
-	tournamentBatch.reserve(tournamentSize);
-	for (auto j = 0u; j < tournamentSize; j++)
+	//std::vector<Individual*> tournamentBatch;
+	//tournamentBatch.reserve(tournamentSize);
+	auto individualIndex = random.getRandomUint(0, static_cast<uint32_t>(population.size() - 1));
+	Individual* winner = population[individualIndex].get();
+	for (auto j = 0u; j < tournamentSize - 1; j++)
 	{
-		auto individualIndex = random.getRandomUint(0, static_cast<uint32_t>(population.size() - 1));
-		tournamentBatch.push_back(population[individualIndex].get());
+		individualIndex = random.getRandomUint(0, static_cast<uint32_t>(population.size() - 1));
+		Individual* tmp = population[individualIndex].get();
+		if (tmp->getCurrentFitness() > winner->getCurrentFitness())
+			winner = tmp;
+		//tournamentBatch.push_back(population[individualIndex].get());
 	}
-	auto tournamentWinnerIt =
-		std::max_element(tournamentBatch.cbegin(), tournamentBatch.cend(),
-			[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
-	return **tournamentWinnerIt;
+	/*auto tournamentWinnerIt =
+		std::min_element(tournamentBatch.cbegin(), tournamentBatch.cend(),
+			[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });*/
+	//return **tournamentWinnerIt;
+	return *winner;
 }
 
 } //namespace ga

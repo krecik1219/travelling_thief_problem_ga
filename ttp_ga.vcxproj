@@ -91,6 +91,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link />
   </ItemDefinitionGroup>
@@ -160,9 +161,6 @@
     <ClInclude Include="src\ttp\TtpIndividual.hpp" />
     <ClInclude Include="src\utils\RandomUtils.hpp" />
     <ClInclude Include="src\utils\StringUtils.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -82,6 +82,7 @@ double TtpIndividual::computeFitness()
 {
 	fillKnapsack();
 	return knapsack.getKnapsackValue() - getTripTime();
+	//return tsp.getTotalDistance();
 }
 
 double TtpIndividual::computeAndSetFitness()

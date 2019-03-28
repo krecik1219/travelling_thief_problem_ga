@@ -1,5 +1,5 @@
 #pragma once
-
+#include <iostream>
 #include <algorithm>
 #include <chrono>
 #include <functional>
@@ -272,6 +272,7 @@ void GAlg<Individual>::logState() const
 		[](const auto& acc, const auto& individual) {return acc + individual->getCurrentFitness(); });
 	auto avgFitness = sumOfFitnesses / population.size();
 	logger.log("%d, %.4f, %.4f, %.4f", populationsNum, bestCurrentFitness, avgFitness, worstCurrentFitness);
+	//std::cout << populationsNum << ", " << bestCurrentFitness << ", " << avgFitness << ", " << worstCurrentFitness << std::endl;
 }
 
 } // namespace ga
