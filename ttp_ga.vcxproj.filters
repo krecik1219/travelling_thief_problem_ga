@@ -48,6 +48,9 @@
     <ClCompile Include="src\loader\GAlgConfigLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\pareto\SolutionsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\loader\InstanceLoader.hpp">
@@ -111,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\naive\GreedyAlg.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pareto\SolutionsSet.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

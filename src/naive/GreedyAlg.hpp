@@ -59,7 +59,9 @@ typename GreedyAlg<Individual>::IndividualPtr GreedyAlg<Individual>::executeAlg(
 		}
 		ttp::TspSolution tsp(ttpConfig, std::move(cities));
 		IndividualPtr individual = std::make_unique<ttp::TtpIndividual>(ttpConfig, std::move(tsp));
-		double fitness = individual->evaluate();
+		// double fitness = individual->evaluate();
+		auto fitnessPair = individual->evaluate();
+		double fitness = -fitnessPair.second - fitnessPair.first;
 		if (fitness > bestFitness) {
 			best = std::move(individual);
 			bestFitness = fitness;

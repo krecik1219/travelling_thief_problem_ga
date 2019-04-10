@@ -9,7 +9,8 @@ TtpIndividual::TtpIndividual(const config::TtpConfig& ttpConfig, TspSolution&& t
 	: ttpConfig(ttpConfig)
 	, tsp(std::move(tsp))
 	, knapsack(ttpConfig.capacityOfKnapsack)
-	, currentFitness(-std::numeric_limits<double>::infinity())
+	, timeObjectiveFitness(std::numeric_limits<double>::infinity())
+	, minusProfitObjectiveFitness(std::numeric_limits<double>::infinity())
 	, isCurrentFitnessValid(false)
 {
 }
@@ -65,32 +66,47 @@ double TtpIndividual::getCurrentVelocity(const uint32_t currentWeight) const
 	return ttpConfig.maxVelocity - currentWeight * ((ttpConfig.maxVelocity - ttpConfig.minVelocity) / ttpConfig.capacityOfKnapsack);
 }
 
-double TtpIndividual::getCurrentFitness() const
+std::pair<double, double> TtpIndividual::getCurrentMultiObjectiveFitness() const
 {
-	return currentFitness;
+	return std::make_pair(timeObjectiveFitness, minusProfitObjectiveFitness);
 }
 
-double TtpIndividual::evaluate()
+std::pair<double, double> TtpIndividual::evaluate()
 {
 	if (isCurrentFitnessValid)
-		return currentFitness;
+		return std::make_pair(timeObjectiveFitness, minusProfitObjectiveFitness);
 
 	return computeAndSetFitness();
 }
 
-double TtpIndividual::computeFitness()
+double TtpIndividual::getCurrentTimeObjectiveFitness() const
 {
-	fillKnapsack();
-	return knapsack.getKnapsackValue() - getTripTime();
-	//return tsp.getTotalDistance();
+	return timeObjectiveFitness;
 }
 
-double TtpIndividual::computeAndSetFitness()
+double TtpIndividual::getCurrentMinusProfitObjectiveFitness() const
 {
-	auto fitness = computeFitness();
-	currentFitness = fitness;
+	return minusProfitObjectiveFitness;
+}
+
+std::pair<double, double> TtpIndividual::computeFitness()
+{
+	fillKnapsack();
+	return std::make_pair(getTripTime(), -knapsack.getKnapsackValue());
+}
+
+std::pair<double, double> TtpIndividual::computeAndSetFitness()
+{
+	auto fitnessPair = computeFitness();
+	timeObjectiveFitness = fitnessPair.first;
+	minusProfitObjectiveFitness = fitnessPair.second;
 	isCurrentFitnessValid = true;
-	return fitness;
+	return fitnessPair;
+}
+
+double TtpIndividual::getCurrentFitness() const
+{
+	return -minusProfitObjectiveFitness - timeObjectiveFitness;
 }
 
 void TtpIndividual::mutation()
@@ -101,8 +117,8 @@ void TtpIndividual::mutation()
 
 std::unique_ptr<TtpIndividual> TtpIndividual::crossoverNrx(const TtpIndividual& parent2) const
 {
-	auto tripTime1 = static_cast<double>(knapsack.getKnapsackValue()) - currentFitness;
-	auto tripTime2 = static_cast<double>(knapsack.getKnapsackValue()) - parent2.currentFitness;
+	auto tripTime1 = static_cast<double>(knapsack.getKnapsackValue()) - getCurrentFitness();
+	auto tripTime2 = static_cast<double>(knapsack.getKnapsackValue()) - getCurrentFitness();
 	auto offspring = tsp.crossoverNrx(tripTime1, parent2.tsp, tripTime2);
 	return std::make_unique<TtpIndividual>(ttpConfig, std::move(offspring));
 }
@@ -121,7 +137,7 @@ std::string TtpIndividual::getStringRepresentation() const
 	auto tspStr = tsp.getStringRepresentation();
 	auto knapsackStr = knapsack.getStringRepresentation();
 	return "TSP: " + tspStr + "\n" + "knapsack: " + knapsackStr +
-		"\ntotal time: " + std::to_string(getTripTime()) + "\nfitness: " + std::to_string(currentFitness);
+		"\ntotal time: " + std::to_string(getTripTime()) + "\nfitness: " + std::to_string(getCurrentFitness());
 }
 
 void TtpIndividual::fillKnapsack()

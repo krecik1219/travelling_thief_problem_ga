@@ -38,6 +38,7 @@ public:
 
 	void run();
 	IndividualPtr getBestIndividual() const;
+	std::vector<IndividualPtr> getPopulation() const;
 
 private:
 
@@ -96,6 +97,16 @@ template<class Individual>
 typename GAlg<Individual>::IndividualPtr GAlg<Individual>::getBestIndividual() const
 {
 	return std::make_unique<Individual>(*bestIndividualSoFar);
+}
+
+template<class Individual>
+std::vector<typename GAlg<Individual>::IndividualPtr> GAlg<Individual>::getPopulation() const
+{
+	std::vector<IndividualPtr> populationCopy;
+	populationCopy.reserve(population.size());
+	for (const auto& individual : population)
+		populationCopy.push_back(std::make_unique<Individual>(*individual));
+	return populationCopy;
 }
 
 template<class Individual>

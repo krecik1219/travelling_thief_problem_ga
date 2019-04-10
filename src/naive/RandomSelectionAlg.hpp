@@ -37,7 +37,9 @@ typename RandomSelectionAlg<Individual>::IndividualPtr RandomSelectionAlg<Indivi
 	for (auto i = 0u; i < repetitionsNum; i++)
 	{
 		auto randomlySelected = createRandomFun();
-		double fitness = randomlySelected->evaluate();
+		// double fitness = randomlySelected->evaluate();
+		auto fitnessPair = randomlySelected->evaluate();
+		double fitness = -fitnessPair.second - fitnessPair.first;
 		if (fitness > bestFitness) {
 			best = std::move(randomlySelected);
 			bestFitness = fitness;

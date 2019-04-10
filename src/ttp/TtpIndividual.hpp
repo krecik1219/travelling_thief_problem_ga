@@ -30,22 +30,26 @@ public:
 	double getTripTime() const;
 	double getTripTime(const uint32_t startCityPos, const uint32_t weight) const;
 	double getCurrentVelocity(const uint32_t currentWeight) const;
+	std::pair<double, double> getCurrentMultiObjectiveFitness() const;
+	std::pair<double, double> evaluate();
+	double getCurrentTimeObjectiveFitness() const;
+	double getCurrentMinusProfitObjectiveFitness() const;
 	double getCurrentFitness() const;
-	double evaluate();
 	void mutation();
 	std::unique_ptr<TtpIndividual> crossoverNrx(const TtpIndividual& parent2) const;
 	OffspringsPtrsPair crossoverPmx(const TtpIndividual& parent2) const;
 	std::string getStringRepresentation() const;
 
 private:
-	double computeFitness();
-	double computeAndSetFitness();
+	std::pair<double, double> computeFitness();
+	std::pair<double, double> computeAndSetFitness();
 	void fillKnapsack();
 
 	const config::TtpConfig& ttpConfig;
 	TspSolution tsp;
 	Knapsack knapsack;
-	double currentFitness;
+	double timeObjectiveFitness;
+	double minusProfitObjectiveFitness;
 	bool isCurrentFitnessValid;
 };
 

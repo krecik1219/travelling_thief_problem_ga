@@ -11,6 +11,7 @@
 #include <logger/Logger.hpp>
 #include <naive/GreedyAlg.hpp>
 #include <naive/RandomSelectionAlg.hpp>
+#include <pareto/SolutionsSet.hpp>
 
 using namespace std::chrono_literals;
 
@@ -52,6 +53,23 @@ int main(int argc, char **argv)
 		naive::RandomSelectionAlg<ttp::TtpIndividual> rndAlg(gAlgConfig.naiveRepetitions, createRandomFun);
 		auto bestFromRandom = rndAlg.executeAlg();
 		logger4.log("%s", bestFromRandom->getStringRepresentation().c_str());
+
+		// pareto
+		logging::Logger logger5("solutionsFromLastPopualtion.txt");
+		auto population = gAlg.getPopulation();
+		for (auto i = 0u; i < population.size(); i++)
+		{
+			logger5.log("%d, %.4f, %.4f", i + 1, population[i]->getCurrentTimeObjectiveFitness(), population[i]->getCurrentMinusProfitObjectiveFitness());
+		}
+		pareto::SolutionsSet solutionSet;
+		solutionSet.setSolutions(std::move(population));
+		solutionSet.nonDominatedSorting();
+		const auto& paretoFront = solutionSet.getParetoFront();
+		logging::Logger logger6("paretoFront.txt");
+		for (auto i = 0u; i < paretoFront.size(); i++)
+		{
+			logger6.log("%d, %.4f, %.4f", i + 1, paretoFront[i]->getCurrentTimeObjectiveFitness(), paretoFront[i]->getCurrentMinusProfitObjectiveFitness());
+		}
 	}
 	catch (loader::ConfigParsingException& e)
 	{

@@ -27,7 +27,7 @@ public:
 	uint32_t getWeightForCity(const uint32_t cityId) const;
 	void clear();
 	void addItem(const Item& item);
-	uint32_t getKnapsackValue() const;
+	int32_t getKnapsackValue() const;
 	uint32_t getKnapsackCapacity() const;
 	uint32_t getCurrentWeight() const;
 	std::string getStringRepresentation() const;

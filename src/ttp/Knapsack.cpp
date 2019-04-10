@@ -39,9 +39,9 @@ void Knapsack::addItem(const Item& item)
 	knapsackValue += item.profit;
 }
 
-uint32_t Knapsack::getKnapsackValue() const
+int32_t Knapsack::getKnapsackValue() const
 {
-	return knapsackValue;
+	return static_cast<int32_t>(knapsackValue);
 }
 
 uint32_t Knapsack::getKnapsackCapacity() const
