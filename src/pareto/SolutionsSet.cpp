@@ -132,6 +132,7 @@ void SolutionsSet::extractSingleParetoFront(std::vector<ttp::TtpIndividual*>& su
 
 	nonDominatedSets.emplace_back();
 	nonDominatedSets.back().push_back(superSet.at(0));
+	superSet[0]->setRank(rank);
 
 	std::unordered_set<ttp::TtpIndividual*> toBeRemovedFromNonDominatedSet;
 	auto removePred = [&toBeRemovedFromNonDominatedSet](const auto& ttpIndividual) {

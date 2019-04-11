@@ -55,15 +55,17 @@ int main(int argc, char **argv)
 		logger4.log("%s", bestFromRandom->getStringRepresentation().c_str());
 
 		// pareto
-		logging::Logger logger5("solutionsFromLastPopualtion.txt");
+		logging::Logger logger5("results/solutionsFromLastPopualtion.txt");
 		const auto& solutionsSet = gAlg.getSolutionsSet();
 		const auto& solutions = solutionsSet.getSolutions();
 		for (auto i = 0u; i < solutions.size(); i++)
 		{
 			logger5.log("%d, %.4f, %.4f", i + 1, solutions[i]->getCurrentTimeObjectiveFitness(), solutions[i]->getCurrentMinusProfitObjectiveFitness());
 		}
-		const auto& paretoFront = solutionsSet.getParetoFront();
-		logging::Logger logger6("paretoFront.txt");
+		auto paretoFront = solutionsSet.getParetoFront();
+		std::stable_sort(paretoFront.begin(), paretoFront.end(),
+			[](const auto& lhs, const auto& rhs) {return lhs->getCurrentTimeObjectiveFitness() < rhs->getCurrentTimeObjectiveFitness(); });
+		logging::Logger logger6("results/paretoFront.txt");
 		for (auto i = 0u; i < paretoFront.size(); i++)
 		{
 			logger6.log("%d, %.4f, %.4f", i + 1, paretoFront[i]->getCurrentTimeObjectiveFitness(), paretoFront[i]->getCurrentMinusProfitObjectiveFitness());
