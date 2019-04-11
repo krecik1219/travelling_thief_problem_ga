@@ -12,8 +12,14 @@ TtpIndividual::TtpIndividual(const config::TtpConfig& ttpConfig, TspSolution&& t
 	, timeObjectiveFitness(std::numeric_limits<double>::infinity())
 	, minusProfitObjectiveFitness(std::numeric_limits<double>::infinity())
 	, isCurrentFitnessValid(false)
+	, rank(0)
+	, crowdingDistance(0)
 {
 }
+
+TtpIndividual::TtpIndividual(const TtpIndividual&) = default;
+TtpIndividual::TtpIndividual(TtpIndividual&&) = default;
+TtpIndividual::~TtpIndividual() = default;
 
 double TtpIndividual::getTripTime() const
 {
@@ -117,9 +123,9 @@ void TtpIndividual::mutation()
 
 std::unique_ptr<TtpIndividual> TtpIndividual::crossoverNrx(const TtpIndividual& parent2) const
 {
-	auto tripTime1 = static_cast<double>(knapsack.getKnapsackValue()) - getCurrentFitness();
-	auto tripTime2 = static_cast<double>(knapsack.getKnapsackValue()) - getCurrentFitness();
-	auto offspring = tsp.crossoverNrx(tripTime1, parent2.tsp, tripTime2);
+	//auto tripTime1 = static_cast<double>(knapsack.getKnapsackValue()) - getCurrentFitness();
+	//auto tripTime2 = static_cast<double>(knapsack.getKnapsackValue()) - getCurrentFitness();  // IT WAS WRONG!!!
+	auto offspring = tsp.crossoverNrx(timeObjectiveFitness, parent2.tsp, parent2.timeObjectiveFitness);
 	return std::make_unique<TtpIndividual>(ttpConfig, std::move(offspring));
 }
 
@@ -138,6 +144,40 @@ std::string TtpIndividual::getStringRepresentation() const
 	auto knapsackStr = knapsack.getStringRepresentation();
 	return "TSP: " + tspStr + "\n" + "knapsack: " + knapsackStr +
 		"\ntotal time: " + std::to_string(getTripTime()) + "\nfitness: " + std::to_string(getCurrentFitness());
+}
+
+void TtpIndividual::setRank(const uint32_t newRank)
+{
+	rank = newRank;
+}
+
+uint32_t TtpIndividual::getRank() const
+{
+	return rank;
+}
+
+void TtpIndividual::setCrowdingDistance(const double newCrodwingDistance)
+{
+	crowdingDistance = newCrodwingDistance;
+}
+
+double TtpIndividual::getCrowdingDistance() const
+{
+	return crowdingDistance;
+}
+
+bool TtpIndividual::operator<(const TtpIndividual& other) const
+{
+	if (rank < other.rank)
+		return true;
+	if (rank == other.rank)
+	{
+		if (crowdingDistance > other.crowdingDistance)
+			return true;
+		else
+			return false;
+	}
+	return false;
 }
 
 void TtpIndividual::fillKnapsack()

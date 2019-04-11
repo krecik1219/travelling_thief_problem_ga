@@ -16,9 +16,9 @@ public:
 	TtpIndividual(const config::TtpConfig& ttpConfig, TspSolution&& tsp);
 
 	TtpIndividual() = delete;
-	TtpIndividual(const TtpIndividual&) = default;
-	TtpIndividual(TtpIndividual&&) = default;
-	~TtpIndividual() = default;
+	TtpIndividual(const TtpIndividual&);
+	TtpIndividual(TtpIndividual&&);
+	~TtpIndividual();
 
 
 	TtpIndividual& operator=(const TtpIndividual&) = delete;
@@ -39,6 +39,12 @@ public:
 	std::unique_ptr<TtpIndividual> crossoverNrx(const TtpIndividual& parent2) const;
 	OffspringsPtrsPair crossoverPmx(const TtpIndividual& parent2) const;
 	std::string getStringRepresentation() const;
+	void setRank(const uint32_t newRank);
+	uint32_t getRank() const;
+	void setCrowdingDistance(const double newCrodwingDistance);
+	double getCrowdingDistance() const;
+
+	bool operator<(const TtpIndividual& other) const;
 
 private:
 	std::pair<double, double> computeFitness();
@@ -51,6 +57,8 @@ private:
 	double timeObjectiveFitness;
 	double minusProfitObjectiveFitness;
 	bool isCurrentFitnessValid;
+	uint32_t rank;
+	double crowdingDistance;
 };
 
 template <class RandomGenerator>

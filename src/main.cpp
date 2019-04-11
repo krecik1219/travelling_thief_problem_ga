@@ -39,9 +39,9 @@ int main(int argc, char **argv)
 
 		logging::Logger logger2(gAlgConfig.bestIndividualResultFile + suffix);
 
-		auto bestIndividual = gAlg.getBestIndividual();
+		/*auto bestIndividual = gAlg.getBestIndividual();
 
-		logger2.log("%s", bestIndividual->getStringRepresentation().c_str());
+		logger2.log("%s", bestIndividual->getStringRepresentation().c_str());*/
 
 
 		logging::Logger logger3(gAlgConfig.bestGreedyAlgPath + suffix);
@@ -56,15 +56,13 @@ int main(int argc, char **argv)
 
 		// pareto
 		logging::Logger logger5("solutionsFromLastPopualtion.txt");
-		auto population = gAlg.getPopulation();
-		for (auto i = 0u; i < population.size(); i++)
+		const auto& solutionsSet = gAlg.getSolutionsSet();
+		const auto& solutions = solutionsSet.getSolutions();
+		for (auto i = 0u; i < solutions.size(); i++)
 		{
-			logger5.log("%d, %.4f, %.4f", i + 1, population[i]->getCurrentTimeObjectiveFitness(), population[i]->getCurrentMinusProfitObjectiveFitness());
+			logger5.log("%d, %.4f, %.4f", i + 1, solutions[i]->getCurrentTimeObjectiveFitness(), solutions[i]->getCurrentMinusProfitObjectiveFitness());
 		}
-		pareto::SolutionsSet solutionSet;
-		solutionSet.setSolutions(std::move(population));
-		solutionSet.nonDominatedSorting();
-		const auto& paretoFront = solutionSet.getParetoFront();
+		const auto& paretoFront = solutionsSet.getParetoFront();
 		logging::Logger logger6("paretoFront.txt");
 		for (auto i = 0u; i < paretoFront.size(); i++)
 		{
