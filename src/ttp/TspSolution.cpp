@@ -185,4 +185,15 @@ std::string TspSolution::getStringRepresentation() const
 	return result;
 }
 
+std::string TspSolution::getGeccoStringRepresentation() const
+{
+	std::string result;
+	const std::string delimiter = " ";
+	for (const auto& city : cityChain)
+		result.append(std::to_string(city.index)).append(delimiter);
+	if (!result.empty())
+		result = result.substr(0, result.length() - delimiter.length());
+	return result;
+}
+
 } // namespace ttp

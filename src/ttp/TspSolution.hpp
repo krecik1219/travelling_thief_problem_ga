@@ -32,7 +32,7 @@ public:
 	TspSolution crossoverNrx(const double parent1Fitness, const TspSolution& parent2, const double parent2Fitness) const;
 	std::pair<TspSolution, TspSolution> crossoverPmx(const TspSolution& parent2) const;
 	std::string getStringRepresentation() const;
-
+	std::string getGeccoStringRepresentation() const;
 
 private:
 	std::vector<City> pmx(const TspSolution& parent1,

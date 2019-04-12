@@ -129,9 +129,10 @@
   <ItemGroup>
     <ClCompile Include="src\configuration\GAlgConfigBase.cpp" />
     <ClCompile Include="src\configuration\TtpConfigBase.cpp" />
+    <ClCompile Include="src\gecco\SolutionsLogger.cpp" />
     <ClCompile Include="src\loader\GAlgConfigLoader.cpp" />
-    <ClCompile Include="src\logger\Logger.cpp" />
     <ClCompile Include="src\loader\InstanceLoader.cpp" />
+    <ClCompile Include="src\logger\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\pareto\SolutionsSet.cpp" />
     <ClCompile Include="src\ttp\Knapsack.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="src\ga\selection\RouletteWheelStrategy.hpp" />
     <ClInclude Include="src\ga\selection\SelectionStrategy.hpp" />
     <ClInclude Include="src\ga\selection\TournamentStrategy.hpp" />
+    <ClInclude Include="src\gecco\SolutionsLogger.hpp" />
     <ClInclude Include="src\loader\GAlgConfigLoader.hpp" />
     <ClInclude Include="src\logger\Logger.hpp" />
     <ClInclude Include="src\loader\ConfigParsingException.hpp" />

@@ -146,6 +146,13 @@ std::string TtpIndividual::getStringRepresentation() const
 		"\ntotal time: " + std::to_string(getTripTime()) + "\nfitness: " + std::to_string(getCurrentFitness());
 }
 
+std::pair<std::string, std::string> TtpIndividual::getGeccoStringRepresentation() const
+{
+	auto tspStr = tsp.getGeccoStringRepresentation();
+	auto knapsackStr = knapsack.getGeccoStringRepresentation(ttpConfig.items);
+	return std::make_pair(std::move(tspStr), std::move(knapsackStr));
+}
+
 void TtpIndividual::setRank(const uint32_t newRank)
 {
 	rank = newRank;

@@ -28,6 +28,7 @@ uint32_t Knapsack::getWeightForCity(const uint32_t cityId) const
 void Knapsack::clear()
 {
 	itemsPerCity.clear();
+	pickedItems.clear();
 	currentWeight = 0u;
 	knapsackValue = 0u;
 }
@@ -35,6 +36,7 @@ void Knapsack::clear()
 void Knapsack::addItem(const Item& item)
 {
 	itemsPerCity[item.cityId].push_back(item);
+	pickedItems.insert(item.index);
 	currentWeight += item.weight;
 	knapsackValue += item.profit;
 }
@@ -72,6 +74,23 @@ std::string Knapsack::getStringRepresentation() const
 	if (!result.empty())
 		result = result.substr(0, result.length() - resultDelimiter.length());
 	result += "; total profit: " + std::to_string(knapsackValue) + "; total weight: " + std::to_string(currentWeight);
+	return result;
+}
+
+std::string Knapsack::getGeccoStringRepresentation(const std::vector<Item>& possibleItems) const
+{
+	std::string result;
+	const std::string delimiter = " ";
+	for (const auto& item : possibleItems)
+	{
+		if (pickedItems.find(item.index) != pickedItems.end())
+			result += "1";
+		else
+			result += "0";
+		result += delimiter;
+	}
+	if (!result.empty())
+		result = result.substr(0, result.length() - delimiter.length());
 	return result;
 }
 

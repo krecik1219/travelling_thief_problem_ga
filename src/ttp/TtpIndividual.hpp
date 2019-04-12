@@ -39,6 +39,7 @@ public:
 	std::unique_ptr<TtpIndividual> crossoverNrx(const TtpIndividual& parent2) const;
 	OffspringsPtrsPair crossoverPmx(const TtpIndividual& parent2) const;
 	std::string getStringRepresentation() const;
+	std::pair<std::string, std::string> getGeccoStringRepresentation() const;
 	void setRank(const uint32_t newRank);
 	uint32_t getRank() const;
 	void setCrowdingDistance(const double newCrodwingDistance);

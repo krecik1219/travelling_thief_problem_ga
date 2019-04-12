@@ -12,6 +12,7 @@
 #include <naive/GreedyAlg.hpp>
 #include <naive/RandomSelectionAlg.hpp>
 #include <pareto/SolutionsSet.hpp>
+#include <gecco/SolutionsLogger.hpp>
 
 using namespace std::chrono_literals;
 
@@ -70,6 +71,9 @@ int main(int argc, char **argv)
 		{
 			logger6.log("%d, %.4f, %.4f", i + 1, paretoFront[i]->getCurrentTimeObjectiveFitness(), paretoFront[i]->getCurrentMinusProfitObjectiveFitness());
 		}
+
+		gecco::SolutionsLogger solutionsLogger("results/solutions.txt", "results/objectives.txt");
+		solutionsLogger.log(solutionsSet);
 	}
 	catch (loader::ConfigParsingException& e)
 	{

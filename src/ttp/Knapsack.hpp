@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "Item.hpp"
 #include <configuration/TtpConfig.hpp>
@@ -31,11 +32,13 @@ public:
 	uint32_t getKnapsackCapacity() const;
 	uint32_t getCurrentWeight() const;
 	std::string getStringRepresentation() const;
+	std::string getGeccoStringRepresentation(const std::vector<Item>& possibleItems) const;
 
 private:
 	const uint32_t capacity;
 	uint32_t currentWeight;
 	ItemsPerCity itemsPerCity;
+	std::unordered_set<uint32_t> pickedItems;
 	uint32_t knapsackValue;
 };
 

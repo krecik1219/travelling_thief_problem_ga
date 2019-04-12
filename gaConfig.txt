@@ -1,15 +1,15 @@
-INSTANCE CONFIG PATH:   data/easy_0.ttp
-RESULTS CSV FILE:   results/easy_0/result.csv
-BEST INDIVIDUAL RESULT FILE:    results/easy_0/best.txt
-BEST GREEDY ALG PATH:    results/easy_0/greedy_best.txt
-BEST RANDOM ALG PATH:    results/easy_0/random_best.txt
+INSTANCE CONFIG PATH:   data/gecco/a280-n279.txt
+RESULTS CSV FILE:   results/gecco/a280-n279/result.csv
+BEST INDIVIDUAL RESULT FILE:    results/gecco/a280-n279/best.txt
+BEST GREEDY ALG PATH:    results/gecco/a280-n279/greedy_best.txt
+BEST RANDOM ALG PATH:    results/gecco/a280-n279/random_best.txt
 NAIVE REPETITIONS:    10
 POPULATION SIZE:    1000
 SELECTION STRATEGY:    tournament
 TOURNAMENT SIZE:    2
-MAX GENERATIONS NUM:	1000
+MAX GENERATIONS NUM:	100
 MAX ALG SECONDS DURATION:   0
-CROSSOVER PROBABILITY:  0.7
-MUTATION PROBABILITY:   0.1
+CROSSOVER PROBABILITY:  0.3
+MUTATION PROBABILITY:   0.4
 
 
