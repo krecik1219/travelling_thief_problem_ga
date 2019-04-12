@@ -94,7 +94,11 @@ void SolutionsSet::nonDominatedSorting()
 	std::vector<ttp::TtpIndividual*> superSet;
 	superSet.reserve(solutions.size());
 	for (auto& solution : solutions)
+	{
+		solution->setCrowdingDistance(0);  // reset crowding distance
+		solution->setRank(0);  // reset rank
 		superSet.push_back(solution.get());
+	}
 
 	nonDominatedSets = std::vector<std::vector<ttp::TtpIndividual*>>();
 	uint32_t rank = 1u;
