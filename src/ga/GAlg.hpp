@@ -14,6 +14,7 @@
 #include "selection/SelectionStrategy.hpp"
 #include "selection/TournamentStrategy.hpp"
 #include "selection/RouletteWheelStrategy.hpp"
+#include <gecco/SolutionsLogger.hpp>
 
 
 namespace ga {
@@ -30,7 +31,8 @@ class GAlg
 public:
 	using IndividualPtr = std::unique_ptr<Individual>;
 
-	GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun, logging::Logger& logger);
+	GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun,
+		logging::Logger& logger, gecco::SolutionsLogger& solutionsLogger);
 
 	GAlg() = delete;
 	GAlg(const GAlg&) = delete;
@@ -64,6 +66,7 @@ private:
 	void setBestIndividualSoFar();
 
 	void logState() const;
+	void logParetoFront() const;
 
 	config::GAlgParams params;
 	std::function<IndividualPtr(void)> createRandomFun;
@@ -72,17 +75,20 @@ private:
 
 	IndividualPtr bestIndividualSoFar;
 	logging::Logger& logger;
+	gecco::SolutionsLogger& solutionsLogger;
 	Tp startTimestamp;
 	uint32_t populationsNum;
 	SolutionsSet solutionsSet;
 };
 
 template<class Individual>
-GAlg<Individual>::GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun, logging::Logger& logger)
+GAlg<Individual>::GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun,
+	logging::Logger& logger, gecco::SolutionsLogger& solutionsLogger)
 	: params(params)
 	, createRandomFun(std::move(createRandomFun))
 	, selectionStrategy(makeSelectionStrategy())
 	, logger(logger)
+	, solutionsLogger(solutionsLogger)
 	, populationsNum(0)
 	, solutionsSet(params.populationSize)
 {
@@ -98,6 +104,7 @@ void GAlg<Individual>::run()
 	// setBestIndividualSoFar();  // in multtiobjetive this cannot be used, it might be replaced with best pareto front forming maybe?
 	logState();  // should not be used, but left for now, because of convenience
 	gaLoop();
+	logParetoFront();
 }
 
 template<class Individual>
@@ -289,6 +296,12 @@ void GAlg<Individual>::logState() const
 	auto avgFitness = sumOfFitnesses / population.size();
 	logger.log("%d, %.4f, %.4f, %.4f", populationsNum, bestCurrentFitness, avgFitness, worstCurrentFitness);*/
 	//std::cout << populationsNum << ", " << bestCurrentFitness << ", " << avgFitness << ", " << worstCurrentFitness << std::endl;
+}
+
+template<class Individual>
+void GAlg<Individual>::logParetoFront() const
+{
+	solutionsLogger.log(solutionsSet);
 }
 
 } // namespace ga

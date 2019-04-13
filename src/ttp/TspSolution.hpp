@@ -14,9 +14,9 @@ public:
 	TspSolution(const config::TtpConfig& ttpConfig, std::vector<City>&& cities);
 
 	TspSolution() = delete;
-	TspSolution(const TspSolution&) = default;
-	TspSolution(TspSolution&&) = default;
-	~TspSolution() = default;
+	TspSolution(const TspSolution&);
+	TspSolution(TspSolution&&);
+	~TspSolution();
 
 	TspSolution& operator=(const TspSolution& other) = delete;
 	TspSolution& operator=(TspSolution&& other) = delete;
@@ -30,15 +30,16 @@ public:
 	uint32_t getIndexOfCityInChain(const uint32_t cityId) const;
 	void mutation();
 	TspSolution crossoverNrx(const double parent1Fitness, const TspSolution& parent2, const double parent2Fitness) const;
-	std::pair<TspSolution, TspSolution> crossoverPmx(const TspSolution& parent2) const;
+	//std::pair<TspSolution, TspSolution> crossoverPmx(const TspSolution& parent2) const;
 	std::string getStringRepresentation() const;
 	std::string getGeccoStringRepresentation() const;
 
 private:
-	std::vector<City> pmx(const TspSolution& parent1,
-		const TspSolution& parent2, const uint32_t partitionIndex1, const uint32_t partitionIndex2) const;
+	/*std::vector<City> pmx(const TspSolution& parent1,
+		const TspSolution& parent2, const uint32_t partitionIndex1, const uint32_t partitionIndex2) const;*/
 
 	const config::TtpConfig& ttpConfig;
+	const uint32_t firstMutableCityIndexInChain;
 	std::vector<ttp::City> cityChain;
 };
 
@@ -46,7 +47,7 @@ template <class RandomGenerator>
 TspSolution TspSolution::createRandom(const config::TtpConfig& ttpConfig, RandomGenerator&& g)
 {
 	auto cities = ttpConfig.cities;
-	std::shuffle(cities.begin(), cities.end(), g);
+	std::shuffle(std::next(cities.begin()), cities.end(), g);
 	return TspSolution(ttpConfig, std::move(cities));
 }
 

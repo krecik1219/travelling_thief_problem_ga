@@ -37,7 +37,7 @@ public:
 	double getCurrentFitness() const;
 	void mutation();
 	std::unique_ptr<TtpIndividual> crossoverNrx(const TtpIndividual& parent2) const;
-	OffspringsPtrsPair crossoverPmx(const TtpIndividual& parent2) const;
+	//OffspringsPtrsPair crossoverPmx(const TtpIndividual& parent2) const;
 	std::string getStringRepresentation() const;
 	std::pair<std::string, std::string> getGeccoStringRepresentation() const;
 	void setRank(const uint32_t newRank);

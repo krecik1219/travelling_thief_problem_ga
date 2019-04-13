@@ -1,5 +1,6 @@
 #include "TtpIndividual.hpp"
 
+#include <cmath>
 #include <memory>
 #include <utility>
 
@@ -31,16 +32,18 @@ double TtpIndividual::getTripTime() const
 	double tripTime = 0;
 	for (auto i = 0u; i < cityChain.size() - 1; i++)
 	{
-		auto distance = cityChain[i].getDistance(cityChain[i + 1]);
+		// double distance = cityChain[i].getDistance(cityChain[i + 1]);
+		double distance = std::ceil(cityChain[i].getDistance(cityChain[i + 1]));  // gecco uses Math.ceil in distance calculation
 		totalWeight += knapsack.getWeightForCity(cityChain[i].index);
-		auto velocity = getCurrentVelocity(totalWeight);
+		double velocity = getCurrentVelocity(totalWeight);
 		tripTime += distance / velocity;
 	}
 	// below finishing TSP cycle
 	auto index = cityChain.size() - 1;
-	auto distance = cityChain[index].getDistance(cityChain[0]);
+	// double distance = cityChain[index].getDistance(cityChain[0]);
+	double distance = std::ceil(cityChain[index].getDistance(cityChain[0]));  // gecco uses Math.ceil in distance calculation
 	totalWeight += knapsack.getWeightForCity(cityChain[index].index);
-	auto velocity = getCurrentVelocity(totalWeight);
+	double velocity = getCurrentVelocity(totalWeight);
 	tripTime += distance / velocity;
 	return tripTime;
 }
@@ -57,12 +60,14 @@ double TtpIndividual::getTripTime(const uint32_t startCityId, const uint32_t wei
 		knapsack.getCurrentWeight() + weight >= knapsack.getKnapsackCapacity() ? ttpConfig.minVelocity : getCurrentVelocity(weight);
 	for (auto i = startCityPos; i < cityChain.size() - 1; i++)
 	{
-		auto distance = cityChain[i].getDistance(cityChain[i + 1]);
+		// double distance = cityChain[i].getDistance(cityChain[i + 1]);
+		double distance = std::ceil(cityChain[i].getDistance(cityChain[i + 1]));
 		tripTime += distance / velocity;
 	}
 	// below finishing TSP cycle
 	auto index = cityChain.size() - 1;
-	auto distance = cityChain[index].getDistance(cityChain[0]);
+	// double distance = cityChain[index].getDistance(cityChain[0]);
+	double distance = std::ceil(cityChain[index].getDistance(cityChain[0]));
 	tripTime += distance / velocity;
 	return tripTime;
 }
@@ -129,14 +134,14 @@ std::unique_ptr<TtpIndividual> TtpIndividual::crossoverNrx(const TtpIndividual& 
 	return std::make_unique<TtpIndividual>(ttpConfig, std::move(offspring));
 }
 
-OffspringsPtrsPair TtpIndividual::crossoverPmx(const TtpIndividual& parent2) const
-{
-	auto [offspringTsp1, offspringTsp2] = tsp.crossoverPmx(parent2.tsp);
-	return std::make_pair(
-		std::make_unique<TtpIndividual>(ttpConfig, std::move(offspringTsp1)),
-		std::make_unique<TtpIndividual>(ttpConfig, std::move(offspringTsp2))
-	);
-}
+//OffspringsPtrsPair TtpIndividual::crossoverPmx(const TtpIndividual& parent2) const
+//{
+//	auto [offspringTsp1, offspringTsp2] = tsp.crossoverPmx(parent2.tsp);
+//	return std::make_pair(
+//		std::make_unique<TtpIndividual>(ttpConfig, std::move(offspringTsp1)),
+//		std::make_unique<TtpIndividual>(ttpConfig, std::move(offspringTsp2))
+//	);
+//}
 
 std::string TtpIndividual::getStringRepresentation() const
 {

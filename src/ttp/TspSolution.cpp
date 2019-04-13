@@ -12,9 +12,16 @@ namespace ttp {
 
 TspSolution::TspSolution(const config::TtpConfig& ttpConfig, std::vector<City>&& cities)
 	: ttpConfig(ttpConfig)
+	, firstMutableCityIndexInChain(1u)
 	, cityChain(std::move(cities))
 {
 }
+
+TspSolution::TspSolution(const TspSolution&) = default;
+
+TspSolution::TspSolution(TspSolution&&) = default;
+
+TspSolution::~TspSolution() = default;
 
 const std::vector<ttp::City>& TspSolution::getCityChain() const
 {
@@ -69,15 +76,16 @@ void TspSolution::mutation()
 	const int32_t neighbourhoodThreshold = 5;
 	auto& random = utils::rnd::Random::getInstance();
 	auto lastIndexInChain = static_cast<int32_t>(cityChain.size() - 1);
-	auto first = random.getRandomUint(0, lastIndexInChain);
-	auto second = random.getRandomUint(0, lastIndexInChain);
-	auto firstIt = std::next(cityChain.begin(), std::min(first, second));
-	auto secondIt = std::next(cityChain.begin(), std::max(first, second));
+	auto first = random.getRandomUint(firstMutableCityIndexInChain, lastIndexInChain);
+	auto second = random.getRandomUint(firstMutableCityIndexInChain, lastIndexInChain);
+	auto firstIt = std::next(std::next(cityChain.begin(), firstMutableCityIndexInChain), std::min(first, second));
+	auto secondIt = std::next(std::next(cityChain.begin(), firstMutableCityIndexInChain), std::max(first, second));
 	std::reverse(firstIt, secondIt);
-	auto randomGene = random.getRandomUint(0, lastIndexInChain);
+	auto randomGene = random.getRandomUint(firstMutableCityIndexInChain, lastIndexInChain);
 	auto nearestId = ttpConfig.nearestDistanceLookup.at(cityChain[randomGene].index).first;
 	auto nearestCityIndex = static_cast<int32_t>(getIndexOfCityInChain(nearestId));
-	auto leftBound = nearestCityIndex - neighbourhoodThreshold >= 0 ? nearestCityIndex - neighbourhoodThreshold : 0;
+	auto leftBound = nearestCityIndex - neighbourhoodThreshold >= static_cast<int32_t>(firstMutableCityIndexInChain) ?
+		nearestCityIndex - neighbourhoodThreshold : static_cast<int32_t>(firstMutableCityIndexInChain);
 	auto rightBound =
 		nearestCityIndex + neighbourhoodThreshold <= lastIndexInChain ?
 			nearestCityIndex + neighbourhoodThreshold
@@ -98,7 +106,7 @@ TspSolution TspSolution::crossoverNrx(const double parent1TotalTime, const TspSo
 		stepsSum[i + 1] = (getStepsNumTo(referenceCityId, i + 1) * parent1TotalTime + parent2.getStepsNumTo(referenceCityId, i + 1) * parent2TotalTime);
 	
 	auto offspring = ttpConfig.cities;
-	for (auto i = 0u; i < cityChain.size(); i++)
+	for (auto i = firstMutableCityIndexInChain; i < cityChain.size(); i++)
 	{
 		for (auto j = i + 1; j < cityChain.size(); j++)
 		{
@@ -109,69 +117,71 @@ TspSolution TspSolution::crossoverNrx(const double parent1TotalTime, const TspSo
 	return TspSolution(ttpConfig, std::move(offspring));
 }
 
-std::pair<TspSolution, TspSolution> TspSolution::crossoverPmx(const TspSolution& parent2) const
-{
-	auto& random = utils::rnd::Random::getInstance();
-	uint32_t partitionIndex1 = random.getRandomUint(0, static_cast<uint32_t>(cityChain.size() - 1));
-	uint32_t partitionIndex2 = partitionIndex1;
-	while(partitionIndex2 == partitionIndex1)
-		partitionIndex2 = random.getRandomUint(0, static_cast<uint32_t>(cityChain.size() - 1));
-	if (partitionIndex2 < partitionIndex1)
-		std::swap(partitionIndex1, partitionIndex2);
-	
-	return std::make_pair(
-		TspSolution(ttpConfig, pmx(*this, parent2, partitionIndex1, partitionIndex2)),
-		TspSolution(ttpConfig, pmx(parent2, *this, partitionIndex1, partitionIndex2))
-	);
-}
+// TODO: currently commented out, due to changes in approach, important is fact that first city in chain must be the one with index 1
+//std::pair<TspSolution, TspSolution> TspSolution::crossoverPmx(const TspSolution& parent2) const
+//{
+//	auto& random = utils::rnd::Random::getInstance();
+//	uint32_t partitionIndex1 = random.getRandomUint(0, static_cast<uint32_t>(cityChain.size() - 1));
+//	uint32_t partitionIndex2 = partitionIndex1;
+//	while(partitionIndex2 == partitionIndex1)
+//		partitionIndex2 = random.getRandomUint(0, static_cast<uint32_t>(cityChain.size() - 1));
+//	if (partitionIndex2 < partitionIndex1)
+//		std::swap(partitionIndex1, partitionIndex2);
+//	
+//	return std::make_pair(
+//		TspSolution(ttpConfig, pmx(*this, parent2, partitionIndex1, partitionIndex2)),
+//		TspSolution(ttpConfig, pmx(parent2, *this, partitionIndex1, partitionIndex2))
+//	);
+//}
 
-std::vector<City> TspSolution::pmx(const TspSolution& parent1,
-	const TspSolution& parent2, const uint32_t partitionIndex1, const uint32_t partitionIndex2) const
-{
-	// use some extra memory to speed up lookups
-	std::unordered_map<uint32_t, uint32_t> backCityIndexLookup;
-	backCityIndexLookup.reserve(parent1.cityChain.size());
-	for (auto i = 0u; i < parent1.cityChain.size(); i++)
-		backCityIndexLookup[parent1.cityChain[i].index] = i;
-	std::unordered_set<uint32_t> alreadyInOffspring;
-	alreadyInOffspring.reserve(partitionIndex2 - partitionIndex1 + 1);
-	std::vector<City> offspringCities(parent1.cityChain.size());
-
-	// copy cities from random slice in parent1
-	for (auto i = partitionIndex1; i < partitionIndex2; i++)
-	{
-		offspringCities[i] = parent1.cityChain[i];
-		alreadyInOffspring.insert(offspringCities[i].index);
-	}
-
-	// first part to the left of slice
-	for (auto i = 0u; i < partitionIndex1; i++)
-	{
-		uint32_t candidateId = parent2.cityChain[i].index;
-		uint32_t indexOfCandidate = i;
-		while (alreadyInOffspring.find(candidateId) != alreadyInOffspring.end())
-		{
-			indexOfCandidate = backCityIndexLookup[candidateId];
-			candidateId = parent2.cityChain[indexOfCandidate].index;
-		}
-		offspringCities[i] = parent2.cityChain[indexOfCandidate];
-	}
-
-	// second part to the right of slice
-	for (auto i = partitionIndex2; i < parent2.cityChain.size(); i++)
-	{
-		uint32_t candidateId = parent2.cityChain[i].index;
-		uint32_t indexOfCandidate = i;
-		while (alreadyInOffspring.find(candidateId) != alreadyInOffspring.end())
-		{
-			indexOfCandidate = backCityIndexLookup[candidateId];
-			candidateId = parent2.cityChain[indexOfCandidate].index;
-		}
-		offspringCities[i] = parent2.cityChain[indexOfCandidate];
-	}
-
-	return offspringCities;
-}
+// TODO: currently commented out, due to changes in approach, important is fact that first city in chain must be the one with index 1
+//std::vector<City> TspSolution::pmx(const TspSolution& parent1,
+//	const TspSolution& parent2, const uint32_t partitionIndex1, const uint32_t partitionIndex2) const
+//{
+//	// use some extra memory to speed up lookups
+//	std::unordered_map<uint32_t, uint32_t> backCityIndexLookup;
+//	backCityIndexLookup.reserve(parent1.cityChain.size());
+//	for (auto i = 0u; i < parent1.cityChain.size(); i++)
+//		backCityIndexLookup[parent1.cityChain[i].index] = i;
+//	std::unordered_set<uint32_t> alreadyInOffspring;
+//	alreadyInOffspring.reserve(partitionIndex2 - partitionIndex1 + 1);
+//	std::vector<City> offspringCities(parent1.cityChain.size());
+//
+//	// copy cities from random slice in parent1
+//	for (auto i = partitionIndex1; i < partitionIndex2; i++)
+//	{
+//		offspringCities[i] = parent1.cityChain[i];
+//		alreadyInOffspring.insert(offspringCities[i].index);
+//	}
+//
+//	// first part to the left of slice
+//	for (auto i = 0u; i < partitionIndex1; i++)
+//	{
+//		uint32_t candidateId = parent2.cityChain[i].index;
+//		uint32_t indexOfCandidate = i;
+//		while (alreadyInOffspring.find(candidateId) != alreadyInOffspring.end())
+//		{
+//			indexOfCandidate = backCityIndexLookup[candidateId];
+//			candidateId = parent2.cityChain[indexOfCandidate].index;
+//		}
+//		offspringCities[i] = parent2.cityChain[indexOfCandidate];
+//	}
+//
+//	// second part to the right of slice
+//	for (auto i = partitionIndex2; i < parent2.cityChain.size(); i++)
+//	{
+//		uint32_t candidateId = parent2.cityChain[i].index;
+//		uint32_t indexOfCandidate = i;
+//		while (alreadyInOffspring.find(candidateId) != alreadyInOffspring.end())
+//		{
+//			indexOfCandidate = backCityIndexLookup[candidateId];
+//			candidateId = parent2.cityChain[indexOfCandidate].index;
+//		}
+//		offspringCities[i] = parent2.cityChain[indexOfCandidate];
+//	}
+//
+//	return offspringCities;
+//}
 
 std::string TspSolution::getStringRepresentation() const
 {

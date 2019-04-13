@@ -20,7 +20,7 @@ void SolutionsLogger::log(const pareto::SolutionsSet& solutionsSet)
 		individualsLog.log("%s", tsp.c_str());
 		individualsLog.log("%s", knp.c_str());
 		individualsLog.logNewLine();
-		objectiveFunctionsValuesLog.log("%.16f, %.16f", solution->getCurrentTimeObjectiveFitness(), -solution->getCurrentMinusProfitObjectiveFitness());
+		objectiveFunctionsValuesLog.log("%.16f %.16f", solution->getCurrentTimeObjectiveFitness(), -solution->getCurrentMinusProfitObjectiveFitness());
 	}
 }
 

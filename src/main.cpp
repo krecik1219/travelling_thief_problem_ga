@@ -34,7 +34,8 @@ int main(int argc, char **argv)
 		auto ttpConfig = ttpConfigBase.getConfig();
 		auto createRandomFun = [&ttpConfig, &g]() {return ttp::TtpIndividual::createRandom(ttpConfig, g); };
 		logging::Logger logger(gAlgConfig.resultsCsvFile + suffix);
-		ga::GAlg<ttp::TtpIndividual> gAlg(gAlgConfig.gAlgParams, createRandomFun, logger);
+		gecco::SolutionsLogger solutionsLogger(gAlgConfig.paretoFrontSolutionsFile + suffix, gAlgConfig.paretoFrontValuesFile + suffix);
+		ga::GAlg<ttp::TtpIndividual> gAlg(gAlgConfig.gAlgParams, createRandomFun, logger, solutionsLogger);
 
 		gAlg.run();
 
@@ -71,9 +72,6 @@ int main(int argc, char **argv)
 		{
 			logger6.log("%d, %.4f, %.4f", i + 1, paretoFront[i]->getCurrentTimeObjectiveFitness(), paretoFront[i]->getCurrentMinusProfitObjectiveFitness());
 		}
-
-		gecco::SolutionsLogger solutionsLogger("results/solutions.txt", "results/objectives.txt");
-		solutionsLogger.log(solutionsSet);
 	}
 	catch (loader::ConfigParsingException& e)
 	{
