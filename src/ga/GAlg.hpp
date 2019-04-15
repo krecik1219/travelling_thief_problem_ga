@@ -174,9 +174,9 @@ void GAlg<Individual>::selection()
 		const Individual& parent2 = selectionStrategy->selectParent(solutionsSet.getSolutions());
 		insertToChildren(parent1, parent2, children);
 	}
-	//asyncMutation();
+	asyncMutation();
 	solutionsSet.addSolutions(std::move(children));
-	//mutationAwaiting.clear();
+	mutationAwaiting.clear();
 }
 
 template<class Individual>
@@ -216,8 +216,8 @@ void GAlg<Individual>::proceedWithOneParentInsertion(
 		individual = std::make_unique<Individual>(parent1);
 	else
 		individual = std::make_unique<Individual>(parent2);
-	followWithMutation(*individual);
-	//mutationAwaiting.push_back(std::make_pair(individual.get(), false));
+	//followWithMutation(*individual);
+	mutationAwaiting.push_back(std::make_pair(individual.get(), false));
 	children.push_back(std::move(individual));
 }
 
@@ -227,10 +227,10 @@ void GAlg<Individual>::proceedWithBothParentsInsertion(
 {
 	auto individual1 = std::make_unique<Individual>(parent1);
 	auto individual2 = std::make_unique<Individual>(parent2);
-	followWithMutation(*individual1);
-	followWithMutation(*individual2);
-	//mutationAwaiting.push_back(std::make_pair(individual1.get(), false));
-	//mutationAwaiting.push_back(std::make_pair(individual2.get(), false));
+	//followWithMutation(*individual1);
+	//followWithMutation(*individual2);
+	mutationAwaiting.push_back(std::make_pair(individual1.get(), false));
+	mutationAwaiting.push_back(std::make_pair(individual2.get(), false));
 	children.push_back(std::move(individual1));
 	children.push_back(std::move(individual2));
 }
