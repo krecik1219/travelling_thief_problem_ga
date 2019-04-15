@@ -127,6 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\async\AsyncSubTask.cpp" />
+    <ClCompile Include="src\async\AsyncTask.cpp" />
+    <ClCompile Include="src\async\ExecutionManager.cpp" />
+    <ClCompile Include="src\async\Executor.cpp" />
     <ClCompile Include="src\configuration\GAlgConfigBase.cpp" />
     <ClCompile Include="src\configuration\TtpConfigBase.cpp" />
     <ClCompile Include="src\gecco\SolutionsLogger.cpp" />
@@ -142,6 +146,10 @@
     <ClCompile Include="src\utils\StringUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\async\AsyncSubTask.hpp" />
+    <ClInclude Include="src\async\AsyncTask.hpp" />
+    <ClInclude Include="src\async\ExecutionManager.hpp" />
+    <ClInclude Include="src\async\Executor.hpp" />
     <ClInclude Include="src\configuration\GAlgConfig.hpp" />
     <ClInclude Include="src\configuration\GAlgConfigBase.hpp" />
     <ClInclude Include="src\configuration\TtpConfig.hpp" />
