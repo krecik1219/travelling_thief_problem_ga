@@ -66,6 +66,12 @@
     <ClCompile Include="src\async\AsyncTask.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\async\GenericLambdaAsyncTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\async\GenericLambdaAsyncSubTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\loader\InstanceLoader.hpp">
@@ -147,6 +153,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\async\AsyncTask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\async\GenericLambdaAsyncTask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\async\GenericLambdaAsyncSubTask.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

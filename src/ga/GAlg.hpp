@@ -16,12 +16,16 @@
 #include "selection/RouletteWheelStrategy.hpp"
 #include <gecco/SolutionsLogger.hpp>
 
+#include <async/GenericLambdaAsyncTask.hpp>
+#include <async/GenericLambdaAsyncSubTask.hpp>
+#include <async/ExecutionManager.hpp>
 
 namespace ga {
 
 using SteadyClock = std::chrono::steady_clock;
 using Tp = std::chrono::time_point<SteadyClock>;
 using namespace pareto;
+using namespace async;
 
 // TODO: This approach is highly implementation dependent now, should be changed to generic one
 
@@ -66,6 +70,8 @@ private:
 
 	void logState() const;
 
+	void asyncMutation();
+
 	config::GAlgParams params;
 	std::function<IndividualPtr(void)> createRandomFun;
 
@@ -76,6 +82,11 @@ private:
 	Tp startTimestamp;
 	uint32_t populationsNum;
 	SolutionsSet solutionsSet;
+
+	std::vector<std::pair<Individual*, bool>> mutationAwaiting;
+	
+	std::atomic<uint32_t> mutationAwaitingNumWas;
+	std::atomic<uint32_t> doneMutations;
 };
 
 template<class Individual>
@@ -163,7 +174,9 @@ void GAlg<Individual>::selection()
 		const Individual& parent2 = selectionStrategy->selectParent(solutionsSet.getSolutions());
 		insertToChildren(parent1, parent2, children);
 	}
+	//asyncMutation();
 	solutionsSet.addSolutions(std::move(children));
+	//mutationAwaiting.clear();
 }
 
 template<class Individual>
@@ -204,6 +217,7 @@ void GAlg<Individual>::proceedWithOneParentInsertion(
 	else
 		individual = std::make_unique<Individual>(parent2);
 	followWithMutation(*individual);
+	//mutationAwaiting.push_back(std::make_pair(individual.get(), false));
 	children.push_back(std::move(individual));
 }
 
@@ -215,6 +229,8 @@ void GAlg<Individual>::proceedWithBothParentsInsertion(
 	auto individual2 = std::make_unique<Individual>(parent2);
 	followWithMutation(*individual1);
 	followWithMutation(*individual2);
+	//mutationAwaiting.push_back(std::make_pair(individual1.get(), false));
+	//mutationAwaiting.push_back(std::make_pair(individual2.get(), false));
 	children.push_back(std::move(individual1));
 	children.push_back(std::move(individual2));
 }
@@ -265,6 +281,42 @@ template<class Individual>
 void GAlg<Individual>::logState() const
 {
 	solutionsLogger.log(solutionsSet);
+}
+
+template<class Individual>
+void GAlg<Individual>::asyncMutation()
+{
+	mutationAwaitingNumWas = static_cast<uint32_t>(mutationAwaiting.size());
+	AsyncTaskPtr task =
+		std::make_unique<GenericLambdaAsyncTask>(
+			[this] (const uint32_t /*sugesstedNumberOfSubTasks*/)
+			{
+				std::cout << "Splitting task. Thread id=" << std::this_thread::get_id << std::endl;	
+				uint32_t awaitingNum = static_cast<uint32_t>(mutationAwaiting.size()) / 8u;
+				std::vector<AsyncSubTaskPtr> subTasks;
+				for (auto i = 0u; i < awaitingNum + 1; i++)
+				{
+					subTasks.push_back(std::make_unique<GenericLambdaAsyncSubTask>(
+						[this, i] ()
+						{
+							std::cout << "subtask execution. I= " << i << " Thread id=" << std::this_thread::get_id << std::endl;
+							for (auto j = 8 * i; j < 8 * (i + 1) && j < mutationAwaiting.size(); j++)
+							{
+								std::cout << "subtask execution follow with mutatation. I= " << i << " J= " << j << " Thread id=" << std::this_thread::get_id << std::endl;
+								followWithMutation(*mutationAwaiting[j].first);
+								mutationAwaiting[j].second = true;
+								doneMutations++;
+							}
+						}
+					));
+				}
+				return subTasks;
+			},
+			8u
+	);
+	ExecutionManager executionManager(std::move(task));
+	executionManager.executeTask();
+	executionManager.waitForExecutionDone();
 }
 
 } // namespace ga

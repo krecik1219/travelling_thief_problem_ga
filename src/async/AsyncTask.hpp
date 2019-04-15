@@ -21,6 +21,7 @@ public:
 	AsyncTask& operator=(AsyncTask&&);
 
 	virtual std::vector<AsyncSubTaskPtr> split() = 0;
+	virtual std::vector<AsyncSubTaskPtr> split(const uint32_t suggestedSubTasksNum) = 0;
 };
 
 }

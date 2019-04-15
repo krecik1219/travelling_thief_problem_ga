@@ -131,6 +131,8 @@
     <ClCompile Include="src\async\AsyncTask.cpp" />
     <ClCompile Include="src\async\ExecutionManager.cpp" />
     <ClCompile Include="src\async\Executor.cpp" />
+    <ClCompile Include="src\async\GenericLambdaAsyncSubTask.cpp" />
+    <ClCompile Include="src\async\GenericLambdaAsyncTask.cpp" />
     <ClCompile Include="src\configuration\GAlgConfigBase.cpp" />
     <ClCompile Include="src\configuration\TtpConfigBase.cpp" />
     <ClCompile Include="src\gecco\SolutionsLogger.cpp" />
@@ -150,6 +152,8 @@
     <ClInclude Include="src\async\AsyncTask.hpp" />
     <ClInclude Include="src\async\ExecutionManager.hpp" />
     <ClInclude Include="src\async\Executor.hpp" />
+    <ClInclude Include="src\async\GenericLambdaAsyncSubTask.hpp" />
+    <ClInclude Include="src\async\GenericLambdaAsyncTask.hpp" />
     <ClInclude Include="src\configuration\GAlgConfig.hpp" />
     <ClInclude Include="src\configuration\GAlgConfigBase.hpp" />
     <ClInclude Include="src\configuration\TtpConfig.hpp" />

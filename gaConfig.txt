@@ -1,17 +1,17 @@
-INSTANCE CONFIG PATH:   data/gecco/fnl4461-n44600.txt
-RESULTS CSV FILE:   results/gecco/fnl4461-n44600/result.csv
-BEST INDIVIDUAL RESULT FILE:    results/gecco/fnl4461-n44600/best.txt
-PARETO FRONT SOLUTIONS FILE:    results/gecco/fnl4461-n44600/front_solutions.txt
-PARETO FRONT VALUES FILE:    results/gecco/fnl4461-n44600/front_values.txt
-ALL SOLUTIONS VALUES FILE:  results/gecco/fnl4461-n44600/all_solutions.txt
-FRONT SOLUTIONS SORTED VALUES FILE:  results/gecco/fnl4461-n44600/front_solutions_sorted.txt
-BEST GREEDY ALG PATH:    results/gecco/fnl4461-n44600/greedy_best.txt
-BEST RANDOM ALG PATH:    results/gecco/fnl4461-n44600/random_best.txt
+INSTANCE CONFIG PATH:   data/gecco/a280-n279.txt
+RESULTS CSV FILE:   results/gecco/a280-n279/result.csv
+BEST INDIVIDUAL RESULT FILE:    results/gecco/a280-n279/best.txt
+PARETO FRONT SOLUTIONS FILE:    results/gecco/a280-n279/front_solutions.txt
+PARETO FRONT VALUES FILE:    results/gecco/a280-n279/front_values.txt
+ALL SOLUTIONS VALUES FILE:  results/gecco/a280-n279/all_solutions.txt
+FRONT SOLUTIONS SORTED VALUES FILE:  results/gecco/a280-n279/front_solutions_sorted.txt
+BEST GREEDY ALG PATH:    results/gecco/a280-n279/greedy_best.txt
+BEST RANDOM ALG PATH:    results/gecco/a280-n279/random_best.txt
 NAIVE REPETITIONS:    10
 POPULATION SIZE:    100
 SELECTION STRATEGY:    tournament
 TOURNAMENT SIZE:    2
-MAX GENERATIONS NUM:	500
+MAX GENERATIONS NUM:	100
 MAX ALG SECONDS DURATION:   0
 CROSSOVER PROBABILITY:  0.35
-MUTATION PROBABILITY:   0.6
+MUTATION PROBABILITY:   0.5
