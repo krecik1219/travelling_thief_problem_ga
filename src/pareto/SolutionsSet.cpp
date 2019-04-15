@@ -61,9 +61,11 @@ void SolutionsSet::truncate(const uint32_t size)
 		}
 		else
 		{
+			auto objectiveFunctionsMaxMinDiff = getMaxMinObjectiveFunctionsDiff();
+			computeCrowdingDistances(nonDominatedSets[i], objectiveFunctionsMaxMinDiff.first, objectiveFunctionsMaxMinDiff.second);
 			std::stable_sort(nonDominatedSets[i].begin(), nonDominatedSets[i].end(),
 				[](const auto& lhs, const auto& rhs) {
-				return lhs->getCrowdingDistance() > rhs->getCrowdingDistance();
+					return lhs->getCrowdingDistance() > rhs->getCrowdingDistance();
 				}
 			);
 			int32_t diff = static_cast<int32_t>(keptSolutions.size() + nonDominatedSets[i].size()) - static_cast<int32_t>(size);
@@ -88,6 +90,12 @@ void SolutionsSet::truncate(const uint32_t size)
 
 void SolutionsSet::nonDominatedSorting()
 {
+	rankSorting();
+	crowdingDistanceSorting();
+}
+
+void SolutionsSet::rankSorting()
+{
 	if (solutions.size() == 0u)
 		return;
 
@@ -102,10 +110,38 @@ void SolutionsSet::nonDominatedSorting()
 
 	nonDominatedSets = std::vector<std::vector<ttp::TtpIndividual*>>();
 	uint32_t rank = 1u;
-	auto minMaxTimeObjective = 
+
+	std::stable_sort(superSet.begin(), superSet.end(),
+		[](const auto& lhs, const auto& rhs) {
+		return lhs->getCurrentTimeObjectiveFitness() < rhs->getCurrentTimeObjectiveFitness(); }
+	);
+
+	while (!superSet.empty())
+	{
+		extractSingleParetoFront(superSet, rank);
+		rank++;
+	}
+}
+
+void SolutionsSet::crowdingDistanceSorting()
+{
+	if (solutions.size() == 0u)
+		return;
+
+	auto objectiveFunctionsMaxMinDiff = getMaxMinObjectiveFunctionsDiff();
+
+	for(auto& nonDominatedSet : nonDominatedSets)
+	{
+		computeCrowdingDistances(nonDominatedSet, objectiveFunctionsMaxMinDiff.first, objectiveFunctionsMaxMinDiff.second);
+	}
+}
+
+std::pair<double, double> SolutionsSet::getMaxMinObjectiveFunctionsDiff() const
+{
+	auto minMaxTimeObjective =
 		std::minmax_element(solutions.cbegin(), solutions.cend(),
 			[](const auto& lhs, const auto& rhs) {
-				return lhs->getCurrentTimeObjectiveFitness() < rhs->getCurrentTimeObjectiveFitness(); }
+		return lhs->getCurrentTimeObjectiveFitness() < rhs->getCurrentTimeObjectiveFitness(); }
 	);
 	double timeObjectiveMaxMinDiff =
 		(*minMaxTimeObjective.second)->getCurrentTimeObjectiveFitness() - (*minMaxTimeObjective.first)->getCurrentTimeObjectiveFitness();
@@ -119,26 +155,18 @@ void SolutionsSet::nonDominatedSorting()
 	double minusProfitObjectiveMaxMinDiff =
 		(*minMaxMinusProfitObjective.second)->getCurrentMinusProfitObjectiveFitness() - (*minMaxMinusProfitObjective.first)->getCurrentMinusProfitObjectiveFitness();
 
-	while (!superSet.empty())
-	{
-		extractSingleParetoFront(superSet, rank);
-		computeCrowdingDistances(nonDominatedSets.back(), timeObjectiveMaxMinDiff, minusProfitObjectiveMaxMinDiff);
-		rank++;
-	}
+	return std::make_pair(timeObjectiveMaxMinDiff, minusProfitObjectiveMaxMinDiff);
 }
 
 void SolutionsSet::extractSingleParetoFront(std::vector<ttp::TtpIndividual*>& superSet, const uint32_t rank)
 {
-	std::stable_sort(superSet.begin(), superSet.end(),
-		[](const auto& lhs, const auto& rhs) {
-		return lhs->getCurrentTimeObjectiveFitness() < rhs->getCurrentTimeObjectiveFitness(); }
-	);
-
 	nonDominatedSets.emplace_back();
 	nonDominatedSets.back().push_back(superSet.at(0));
 	superSet[0]->setRank(rank);
 
 	std::unordered_set<ttp::TtpIndividual*> toBeRemovedFromNonDominatedSet;
+	std::unordered_set<ttp::TtpIndividual*> toBeRemovedFromSuperSet;
+	toBeRemovedFromSuperSet.insert(superSet[0]);
 	auto removePred = [&toBeRemovedFromNonDominatedSet](const auto& ttpIndividual) {
 		return toBeRemovedFromNonDominatedSet.find(ttpIndividual) != toBeRemovedFromNonDominatedSet.end();
 	};
@@ -161,6 +189,7 @@ void SolutionsSet::extractSingleParetoFront(std::vector<ttp::TtpIndividual*>& su
 		if (!isSolutionDominated)
 		{
 			nonDominatedSets.back().push_back(*itSolutions);
+			toBeRemovedFromSuperSet.insert(*itSolutions);
 			(*itSolutions)->setRank(rank);
 			(*itSolutions)->setCrowdingDistance(0);
 		}
@@ -168,8 +197,8 @@ void SolutionsSet::extractSingleParetoFront(std::vector<ttp::TtpIndividual*>& su
 
 	superSet.erase(
 		std::remove_if(superSet.begin(), superSet.end(),
-			[this](const auto& s) {
-				return std::find(nonDominatedSets.back().begin(), nonDominatedSets.back().end(), s) != nonDominatedSets.back().end();
+			[&toBeRemovedFromSuperSet](const auto& s) {
+				return toBeRemovedFromSuperSet.find(s) != toBeRemovedFromSuperSet.end();
 			}
 		),
 		superSet.end()
@@ -181,7 +210,7 @@ void SolutionsSet::computeCrowdingDistances(std::vector<ttp::TtpIndividual*>& pa
 {
 	paretoFront[0]->setCrowdingDistance(std::numeric_limits<double>::infinity());
 	if (paretoFront.size() > 1)
-		paretoFront[paretoFront.size() - 1]->setCrowdingDistance(std::numeric_limits<double>::infinity());
+		paretoFront.back()->setCrowdingDistance(std::numeric_limits<double>::infinity());
 
 	if (paretoFront.size() < 3)
 		return;
@@ -189,8 +218,9 @@ void SolutionsSet::computeCrowdingDistances(std::vector<ttp::TtpIndividual*>& pa
 	// don't need to sort front in order of time objective, cause it is already sorted
 	for (auto i = 1; i < paretoFront.size() - 1; i++)
 	{
-		double crowdingDistance = paretoFront[i]->getCrowdingDistance();
-		crowdingDistance +=
+		// double crowdingDistance = paretoFront[i]->getCrowdingDistance(); // discard previous crowding distance, it must be recomputed
+		// crowdingDistance += ...
+		double crowdingDistance =
 			(paretoFront[i + 1]->getCurrentTimeObjectiveFitness() - paretoFront[i - 1]->getCurrentTimeObjectiveFitness()) / timeObjectiveMaxMinDiff;
 		paretoFront[i]->setCrowdingDistance(crowdingDistance);
 	}
@@ -202,7 +232,7 @@ void SolutionsSet::computeCrowdingDistances(std::vector<ttp::TtpIndividual*>& pa
 	);
 
 	paretoFront[0]->setCrowdingDistance(std::numeric_limits<double>::infinity());
-	paretoFront[paretoFront.size() - 1]->setCrowdingDistance(std::numeric_limits<double>::infinity());
+	paretoFront.back()->setCrowdingDistance(std::numeric_limits<double>::infinity());
 
 	for (auto i = 1; i < paretoFront.size() - 1; i++)
 	{

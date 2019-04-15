@@ -1,10 +1,12 @@
 #include "TspSolution.hpp"
 
 #include <algorithm>
+#include <array>
 #include <iterator>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 #include <utils/RandomUtils.hpp>
 
@@ -97,8 +99,10 @@ void TspSolution::mutation()
 TspSolution TspSolution::crossoverNrx(const double parent1TotalTime, const TspSolution& parent2, const double parent2TotalTime) const
 {
 	// NRX
-	std::unordered_map<uint32_t, double> stepsSum;
-	stepsSum.reserve(cityChain.size());
+	// std::unordered_map<uint32_t, double> stepsSum;
+	// stepsSum.reserve(cityChain.size());
+	// std::array<double, 50000> stepsSum;
+	std::vector<double> stepsSum(cityChain.size() + 1);
 	auto& random = utils::rnd::Random::getInstance();
 	auto referenceCityPos = random.getRandomUint(0, static_cast<uint32_t>(cityChain.size() - 1));
 	auto referenceCityId = cityChain[referenceCityPos].index;

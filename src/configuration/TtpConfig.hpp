@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <unordered_map>
 #include <string>
@@ -35,6 +36,21 @@ struct TtpConfig
 		}
 	}
 
+	void fillDistanceLookupMatrix()
+	{
+		distanceLookupMatrix.resize(cities.size());
+		for (auto& row : distanceLookupMatrix)
+			row.resize(cities.size());
+
+		for (auto i = 0u; i < cities.size(); i++)
+		{
+			for (auto j = 0u; j < cities.size(); j++)
+			{
+				distanceLookupMatrix[i][j] = std::ceil(cities[i].getDistance(cities[j]));
+			}
+		}
+	}
+
 	std::string problemName;
 	std::string knapsackDataType;
 	uint32_t dimenssion;
@@ -46,5 +62,6 @@ struct TtpConfig
 	std::vector<ttp::City> cities;
 	std::vector<ttp::Item> items;
 	std::unordered_map<uint32_t, std::pair<uint32_t, double>> nearestDistanceLookup;
+	std::vector<std::vector<double>> distanceLookupMatrix;  // index in vector is equal to cityId - 1
 };
 } // namespace config

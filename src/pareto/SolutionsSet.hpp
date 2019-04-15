@@ -34,6 +34,9 @@ public:
 	void truncate(const uint32_t size);
 
 	void nonDominatedSorting();
+	void rankSorting();
+	void crowdingDistanceSorting();
+	std::pair<double, double> getMaxMinObjectiveFunctionsDiff() const;
 
 private:
 	void extractSingleParetoFront(std::vector<ttp::TtpIndividual*>& superSet, const uint32_t rank);

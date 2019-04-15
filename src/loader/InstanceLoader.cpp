@@ -26,6 +26,7 @@ config::TtpConfigBase InstanceLoader::loadTtpConfig(const std::string& filePath)
 	}
 
 	ttpConfig.fillNearestDistanceLookup();
+	ttpConfig.fillDistanceLookupMatrix();
 	return config::TtpConfigBase(std::move(ttpConfig));
 }
 

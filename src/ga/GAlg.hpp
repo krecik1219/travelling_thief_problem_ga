@@ -31,8 +31,7 @@ class GAlg
 public:
 	using IndividualPtr = std::unique_ptr<Individual>;
 
-	GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun,
-		logging::Logger& logger, gecco::SolutionsLogger& solutionsLogger);
+	GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun, gecco::SolutionsLogger& solutionsLogger);
 
 	GAlg() = delete;
 	GAlg(const GAlg&) = delete;
@@ -51,6 +50,7 @@ private:
 	void initialize();
 	void evaluate();
 	void nonDominatedSorting();
+	void rankSorting();
 	void gaLoop();
 	void selection();
 	void makeNextPopulation();
@@ -63,10 +63,8 @@ private:
 
 	bool timeStopCondition();
 	bool populationsNumStopCondition();
-	void setBestIndividualSoFar();
 
 	void logState() const;
-	void logParetoFront() const;
 
 	config::GAlgParams params;
 	std::function<IndividualPtr(void)> createRandomFun;
@@ -74,7 +72,6 @@ private:
 	std::unique_ptr<SelectionStrategy<Individual>> selectionStrategy;
 
 	IndividualPtr bestIndividualSoFar;
-	logging::Logger& logger;
 	gecco::SolutionsLogger& solutionsLogger;
 	Tp startTimestamp;
 	uint32_t populationsNum;
@@ -83,11 +80,10 @@ private:
 
 template<class Individual>
 GAlg<Individual>::GAlg(const config::GAlgParams& params, std::function<IndividualPtr(void)> createRandomFun,
-	logging::Logger& logger, gecco::SolutionsLogger& solutionsLogger)
+	gecco::SolutionsLogger& solutionsLogger)
 	: params(params)
 	, createRandomFun(std::move(createRandomFun))
 	, selectionStrategy(makeSelectionStrategy())
-	, logger(logger)
 	, solutionsLogger(solutionsLogger)
 	, populationsNum(0)
 	, solutionsSet(params.populationSize)
@@ -100,11 +96,8 @@ void GAlg<Individual>::run()
 	startTimestamp = SteadyClock::now();
 	initialize();
 	evaluate();
-	nonDominatedSorting();
-	// setBestIndividualSoFar();  // in multtiobjetive this cannot be used, it might be replaced with best pareto front forming maybe?
-	logState();  // should not be used, but left for now, because of convenience
 	gaLoop();
-	logParetoFront();
+	logState();
 }
 
 template<class Individual>
@@ -140,17 +133,22 @@ void GAlg<Individual>::nonDominatedSorting()
 }
 
 template<class Individual>
+void GAlg<Individual>::rankSorting()
+{
+	solutionsSet.rankSorting();
+}
+
+template<class Individual>
 void GAlg<Individual>::gaLoop()
 {
 	while (!checkStopConditions())
 	{
+		nonDominatedSorting();
 		selection();
 		evaluate();
-		solutionsSet.nonDominatedSorting();
+		rankSorting();
 		makeNextPopulation();
 		populationsNum++;
-		// setBestIndividualSoFar();
-		logState();
 	}
 }
 
@@ -211,7 +209,7 @@ void GAlg<Individual>::proceedWithOneParentInsertion(
 
 template<class Individual>
 void GAlg<Individual>::proceedWithBothParentsInsertion(
-	const Individual & parent1, const Individual & parent2, std::vector<IndividualPtr>& children)
+	const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& children)
 {
 	auto individual1 = std::make_unique<Individual>(parent1);
 	auto individual2 = std::make_unique<Individual>(parent2);
@@ -264,42 +262,7 @@ bool GAlg<Individual>::populationsNumStopCondition()
 }
 
 template<class Individual>
-void GAlg<Individual>::setBestIndividualSoFar()
-{
-	// TODO: multiobjective optimalization no best single soluition
-	//auto bestIndividualIt =
-	//	std::max_element(population.cbegin(), population.cend(),
-	//		[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
-	//if (bestIndividualSoFar == nullptr)
-	//{
-	//	bestIndividualSoFar = std::make_unique<Individual>(**bestIndividualIt);
-	//}
-	//else
-	//{
-	//	const auto best = std::max((*bestIndividualIt).get(), bestIndividualSoFar.get(),
-	//		[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
-	//	if (best != bestIndividualSoFar.get())
-	//		bestIndividualSoFar = std::make_unique<Individual>(*best);
-	//}
-}
-
-template<class Individual>
 void GAlg<Individual>::logState() const
-{
-	// TODO: log proper state for multiobjective optimalization
-	/*auto bestWorstIterators = std::minmax_element(population.cbegin(), population.cend(),
-		[](const auto& lhs, const auto& rhs) {return lhs->getCurrentFitness() < rhs->getCurrentFitness(); });
-	auto bestCurrentFitness = (*bestWorstIterators.second)->getCurrentFitness();
-	auto worstCurrentFitness = (*bestWorstIterators.first)->getCurrentFitness();
-	double sumOfFitnesses = std::accumulate(population.cbegin(), population.cend(), 0.0,
-		[](const auto& acc, const auto& individual) {return acc + individual->getCurrentFitness(); });
-	auto avgFitness = sumOfFitnesses / population.size();
-	logger.log("%d, %.4f, %.4f, %.4f", populationsNum, bestCurrentFitness, avgFitness, worstCurrentFitness);*/
-	//std::cout << populationsNum << ", " << bestCurrentFitness << ", " << avgFitness << ", " << worstCurrentFitness << std::endl;
-}
-
-template<class Individual>
-void GAlg<Individual>::logParetoFront() const
 {
 	solutionsLogger.log(solutionsSet);
 }

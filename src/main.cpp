@@ -15,6 +15,8 @@
 #include <gecco/SolutionsLogger.hpp>
 
 using namespace std::chrono_literals;
+using SteadyClock = std::chrono::steady_clock;
+using Tp = std::chrono::time_point<SteadyClock>;
 
 int main(int argc, char **argv)
 {
@@ -24,6 +26,7 @@ int main(int argc, char **argv)
 	std::random_device rd;
 	std::mt19937 g(rd());
 	std::cout << "starting" << std::endl;
+	Tp startPoint = SteadyClock::now();
 	try
 	{
 		loader::InstanceLoader instanceLoader;
@@ -33,45 +36,27 @@ int main(int argc, char **argv)
 		auto ttpConfigBase = instanceLoader.loadTtpConfig(gAlgConfig.instanceFilePath);
 		auto ttpConfig = ttpConfigBase.getConfig();
 		auto createRandomFun = [&ttpConfig, &g]() {return ttp::TtpIndividual::createRandom(ttpConfig, g); };
-		logging::Logger logger(gAlgConfig.resultsCsvFile + suffix);
-		gecco::SolutionsLogger solutionsLogger(gAlgConfig.paretoFrontSolutionsFile + suffix, gAlgConfig.paretoFrontValuesFile + suffix);
-		ga::GAlg<ttp::TtpIndividual> gAlg(gAlgConfig.gAlgParams, createRandomFun, logger, solutionsLogger);
+		gecco::SolutionsLogger solutionsLogger(gAlgConfig.paretoFrontSolutionsFile + suffix,
+			gAlgConfig.paretoFrontValuesFile + suffix, gAlgConfig.allSolutionsValuesFile + suffix,
+			gAlgConfig.frontSolutionsSortedValuesFile + suffix, static_cast<uint32_t>(ttpConfig.items.size() * 2.5));
+		ga::GAlg<ttp::TtpIndividual> gAlg(gAlgConfig.gAlgParams, createRandomFun, solutionsLogger);
 
 		gAlg.run();
 
-		logging::Logger logger2(gAlgConfig.bestIndividualResultFile + suffix);
-
-		/*auto bestIndividual = gAlg.getBestIndividual();
-
+		/*logging::Logger logger2(gAlgConfig.bestIndividualResultFile + suffix);
+		auto bestIndividual = gAlg.getBestIndividual();
 		logger2.log("%s", bestIndividual->getStringRepresentation().c_str());*/
 
 
-		logging::Logger logger3(gAlgConfig.bestGreedyAlgPath + suffix);
+		/*logging::Logger logger3(gAlgConfig.bestGreedyAlgPath + suffix);
 		naive::GreedyAlg<ttp::TtpIndividual> greedyAlg(gAlgConfig.naiveRepetitions, ttpConfig);
 		auto bestFromGreedy = greedyAlg.executeAlg();
-		logger3.log("%s", bestFromGreedy->getStringRepresentation().c_str());
+		logger3.log("%s", bestFromGreedy->getStringRepresentation().c_str());*/
 
-		logging::Logger logger4(gAlgConfig.bestRandomAlgPath + suffix);
+		/*logging::Logger logger4(gAlgConfig.bestRandomAlgPath + suffix);
 		naive::RandomSelectionAlg<ttp::TtpIndividual> rndAlg(gAlgConfig.naiveRepetitions, createRandomFun);
 		auto bestFromRandom = rndAlg.executeAlg();
-		logger4.log("%s", bestFromRandom->getStringRepresentation().c_str());
-
-		// pareto
-		logging::Logger logger5("results/solutionsFromLastPopualtion.txt");
-		const auto& solutionsSet = gAlg.getSolutionsSet();
-		const auto& solutions = solutionsSet.getSolutions();
-		for (auto i = 0u; i < solutions.size(); i++)
-		{
-			logger5.log("%d, %.4f, %.4f", i + 1, solutions[i]->getCurrentTimeObjectiveFitness(), solutions[i]->getCurrentMinusProfitObjectiveFitness());
-		}
-		auto paretoFront = solutionsSet.getParetoFront();
-		std::stable_sort(paretoFront.begin(), paretoFront.end(),
-			[](const auto& lhs, const auto& rhs) {return lhs->getCurrentTimeObjectiveFitness() < rhs->getCurrentTimeObjectiveFitness(); });
-		logging::Logger logger6("results/paretoFront.txt");
-		for (auto i = 0u; i < paretoFront.size(); i++)
-		{
-			logger6.log("%d, %.4f, %.4f", i + 1, paretoFront[i]->getCurrentTimeObjectiveFitness(), paretoFront[i]->getCurrentMinusProfitObjectiveFitness());
-		}
+		logger4.log("%s", bestFromRandom->getStringRepresentation().c_str());*/
 	}
 	catch (loader::ConfigParsingException& e)
 	{
@@ -81,6 +66,10 @@ int main(int argc, char **argv)
 	{
 		std::cout << "unknown error: " + std::string(e.what()) << std::endl;
 	}
+	Tp endPoint = SteadyClock::now();
+	auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(endPoint - startPoint);
+
+	std::cout << "Elapsed time: " << elapsed.count() << " s" << std::endl;
 
 	std::cout << "finished" << std::endl;
 	//getchar(); getchar();

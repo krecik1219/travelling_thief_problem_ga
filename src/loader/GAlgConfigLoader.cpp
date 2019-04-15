@@ -51,6 +51,16 @@ void GAlgConfigLoader::decideWhatToDoWithLine(const std::string& line, config::G
 		auto value = prepareValueToStore(line);
 		gAlgConfig.paretoFrontValuesFile = value;
 	}
+	else if (line.find("ALL SOLUTIONS VALUES FILE:") != std::string::npos)
+	{
+		auto value = prepareValueToStore(line);
+		gAlgConfig.allSolutionsValuesFile = value;
+	}
+	else if (line.find("FRONT SOLUTIONS SORTED VALUES FILE:") != std::string::npos)
+	{
+		auto value = prepareValueToStore(line);
+		gAlgConfig.frontSolutionsSortedValuesFile = value;
+	}
 	else if (line.find("BEST GREEDY ALG PATH:") != std::string::npos)
 	{
 		auto value = prepareValueToStore(line);

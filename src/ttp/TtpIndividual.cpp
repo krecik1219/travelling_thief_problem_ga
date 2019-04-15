@@ -1,8 +1,10 @@
 #include "TtpIndividual.hpp"
 
+#include <array>
 #include <cmath>
 #include <memory>
 #include <utility>
+#include <vector>
 
 namespace ttp {
 
@@ -33,7 +35,8 @@ double TtpIndividual::getTripTime() const
 	for (auto i = 0u; i < cityChain.size() - 1; i++)
 	{
 		// double distance = cityChain[i].getDistance(cityChain[i + 1]);
-		double distance = std::ceil(cityChain[i].getDistance(cityChain[i + 1]));  // gecco uses Math.ceil in distance calculation
+		// double distance = std::ceil(cityChain[i].getDistance(cityChain[i + 1]));  // gecco uses Math.ceil in distance calculation
+		double distance = ttpConfig.distanceLookupMatrix[cityChain[i].index - 1][cityChain[i + 1].index - 1];  // use lookup matrix instead of lazy calculation
 		totalWeight += knapsack.getWeightForCity(cityChain[i].index);
 		double velocity = getCurrentVelocity(totalWeight);
 		tripTime += distance / velocity;
@@ -41,7 +44,8 @@ double TtpIndividual::getTripTime() const
 	// below finishing TSP cycle
 	auto index = cityChain.size() - 1;
 	// double distance = cityChain[index].getDistance(cityChain[0]);
-	double distance = std::ceil(cityChain[index].getDistance(cityChain[0]));  // gecco uses Math.ceil in distance calculation
+	// double distance = std::ceil(cityChain[index].getDistance(cityChain[0]));  // gecco uses Math.ceil in distance calculation
+	double distance = ttpConfig.distanceLookupMatrix[cityChain[index].index - 1][cityChain[0].index - 1];
 	totalWeight += knapsack.getWeightForCity(cityChain[index].index);
 	double velocity = getCurrentVelocity(totalWeight);
 	tripTime += distance / velocity;
@@ -61,13 +65,15 @@ double TtpIndividual::getTripTime(const uint32_t startCityId, const uint32_t wei
 	for (auto i = startCityPos; i < cityChain.size() - 1; i++)
 	{
 		// double distance = cityChain[i].getDistance(cityChain[i + 1]);
-		double distance = std::ceil(cityChain[i].getDistance(cityChain[i + 1]));
+		// double distance = std::ceil(cityChain[i].getDistance(cityChain[i + 1]));  // lazy calculation
+		double distance = ttpConfig.distanceLookupMatrix[cityChain[i].index - 1][cityChain[i + 1].index - 1];
 		tripTime += distance / velocity;
 	}
 	// below finishing TSP cycle
 	auto index = cityChain.size() - 1;
 	// double distance = cityChain[index].getDistance(cityChain[0]);
-	double distance = std::ceil(cityChain[index].getDistance(cityChain[0]));
+	// double distance = std::ceil(cityChain[index].getDistance(cityChain[0]));
+	double distance = ttpConfig.distanceLookupMatrix[cityChain[index].index - 1][cityChain[0].index - 1];
 	tripTime += distance / velocity;
 	return tripTime;
 }
@@ -195,21 +201,29 @@ bool TtpIndividual::operator<(const TtpIndividual& other) const
 void TtpIndividual::fillKnapsack()
 {
 	knapsack.clear();
-	std::unordered_map<uint32_t, double> scorePerItemWithId;
-	scorePerItemWithId.reserve(ttpConfig.items.size());
-	std::unordered_map<uint32_t, double> totalTravelingDistanceFromCityWihId;
-	totalTravelingDistanceFromCityWihId.reserve(ttpConfig.cities.size());
+	// std::unordered_map<uint32_t, double> scorePerItemWithId;
+	// scorePerItemWithId.reserve(ttpConfig.items.size());
+	// std::array<double, 50000> scorePerItemWithId;
+	std::vector<double> scorePerItemWithId(ttpConfig.items.size() + 1);
+	// std::unordered_map<uint32_t, double> totalTravelingDistanceFromCityWihId;
+	// totalTravelingDistanceFromCityWihId.reserve(ttpConfig.cities.size());
+	// std::array<double, 50000> totalTravelingDistanceFromCityWihId;
+	std::vector<double> totalTravelingDistanceFromCityWihId(ttpConfig.cities.size() + 1);
 	const auto& cities = tsp.getCityChain();
-	totalTravelingDistanceFromCityWihId[cities[cities.size() - 1].index] = cities[cities.size() - 1].getDistance(cities[0]);
+	// totalTravelingDistanceFromCityWihId[cities[cities.size() - 1].index] = cities[cities.size() - 1].getDistance(cities[0]);
+	totalTravelingDistanceFromCityWihId[cities.back().index] = ttpConfig.distanceLookupMatrix[cities.back().index - 1][cities[0].index - 1];
 	auto citiesNum = static_cast<int>(cities.size());
 	for (int i = citiesNum - 2; i >= 0; i--)
 	{
+		/*totalTravelingDistanceFromCityWihId[cities[i].index] =
+			cities[i].getDistance(cities[i + 1]) + totalTravelingDistanceFromCityWihId[cities[i + 1].index];*/
 		totalTravelingDistanceFromCityWihId[cities[i].index] =
-			cities[i].getDistance(cities[i + 1]) + totalTravelingDistanceFromCityWihId[cities[i + 1].index];
+			ttpConfig.distanceLookupMatrix[cities[i].index - 1][cities[i + 1].index - 1] + totalTravelingDistanceFromCityWihId[cities[i + 1].index];
 	}
 	double totalTravellingTimeWithoutItems = totalTravelingDistanceFromCityWihId[cities[0].index] / ttpConfig.maxVelocity;
-	std::unordered_map<uint32_t, double> fitnessUtilization;
-	fitnessUtilization.reserve(ttpConfig.items.size());
+	// std::unordered_map<uint32_t, double> fitnessUtilization;
+	// fitnessUtilization.reserve(ttpConfig.items.size());
+	std::vector<double> fitnessUtilization(ttpConfig.items.size() + 1);
 	for (const auto& item : ttpConfig.items)
 	{
 		//auto timeFromCityWithOneItem = getTripTime(item.cityId, item.weight);
