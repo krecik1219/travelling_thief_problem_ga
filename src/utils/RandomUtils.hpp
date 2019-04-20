@@ -2,11 +2,12 @@
 
 #include <cstdint>
 #include <random>
+#include <mutex>
 
 namespace utils {
 namespace rnd {
 
-// This util class is NOT thread-safe
+// This class is thread-safe, but unefficiently - singleton methods are protected
 class Random final
 {
 public:
@@ -31,6 +32,8 @@ private:
 	std::uniform_int_distribution<uint32_t> uintDis;
 	std::uniform_int_distribution<int32_t> intDis;
 	std::uniform_real_distribution<double> doubleDis;
+
+	std::mutex m;
 };
 
 } // namespace rnd

@@ -106,6 +106,16 @@ double TtpIndividual::getCurrentMinusProfitObjectiveFitness() const
 	return minusProfitObjectiveFitness;
 }
 
+double TtpIndividual::getX() const
+{
+	return getCurrentTimeObjectiveFitness();
+}
+
+double TtpIndividual::getY() const
+{
+	return getCurrentMinusProfitObjectiveFitness();
+}
+
 std::pair<double, double> TtpIndividual::computeFitness()
 {
 	fillKnapsack();

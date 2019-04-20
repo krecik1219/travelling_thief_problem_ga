@@ -32,7 +32,7 @@ public:
 	void waitForExecutionDone();
 
 private:
-	static constexpr uint32_t minNumberOfExecutors = 16u;
+	static constexpr uint32_t minNumberOfExecutors = 8u;
 
 	void sendToExecutor(AsyncSubTaskPtr&& subTask);
 

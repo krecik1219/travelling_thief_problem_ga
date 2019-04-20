@@ -57,6 +57,7 @@ private:
 	void rankSorting();
 	void gaLoop();
 	void selection();
+	void mutateDuplicates();
 	void makeNextPopulation();
 	void insertToChildren(const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& children);
 	void proceedWithOneParentInsertion(const Individual& parent1, const Individual& parent2, std::vector<IndividualPtr>& children);
@@ -134,7 +135,34 @@ template<class Individual>
 void GAlg<Individual>::evaluate()
 {
 	auto& solutions = solutionsSet.getSolutions();
-	std::for_each(solutions.begin(), solutions.end(), [](auto& individual) {individual->evaluate(); });
+	// std::for_each(solutions.begin(), solutions.end(), [](auto& individual) {individual->evaluate(); });
+
+	AsyncTaskPtr task =
+		std::make_unique<GenericLambdaAsyncTask>(
+			[&solutions](const uint32_t /*sugesstedNumberOfSubTasks*/)
+			{
+				const uint32_t subTasksNum = 4u;
+				const uint32_t singleBatchSize = static_cast<uint32_t>(solutions.size()) / subTasksNum;
+				std::vector<AsyncSubTaskPtr> subTasks;
+				for (auto i = 0u; i < subTasksNum + 1; i++)
+				{
+					subTasks.push_back(std::make_unique<GenericLambdaAsyncSubTask>(
+						[&solutions, i, singleBatchSize]()
+						{
+							for (auto j = i * singleBatchSize; j < (i + 1) * singleBatchSize && j < solutions.size(); j++)
+							{
+								solutions[j]->evaluate();
+							}
+						}
+					));
+				}
+				return subTasks;
+			},
+			4u
+		);
+	ExecutionManager executionManager(std::move(task));
+	executionManager.executeTask();
+	executionManager.waitForExecutionDone();
 }
 
 template<class Individual>
@@ -154,9 +182,11 @@ void GAlg<Individual>::gaLoop()
 {
 	while (!checkStopConditions())
 	{
+		std::cout << "Population num: " << populationsNum << std::endl;
 		nonDominatedSorting();
 		selection();
 		evaluate();
+		mutateDuplicates();
 		rankSorting();
 		makeNextPopulation();
 		populationsNum++;
@@ -180,6 +210,32 @@ void GAlg<Individual>::selection()
 }
 
 template<class Individual>
+void GAlg<Individual>::mutateDuplicates()
+{
+	auto& solutions = solutionsSet.getSolutions();
+	std::sort(solutions.begin(), solutions.end(),
+		[](const auto& lhs, const auto& rhs)
+		{
+			return lhs->getCurrentMinusProfitObjectiveFitness() < rhs->getCurrentMinusProfitObjectiveFitness();
+		}
+	);
+	std::stable_sort(solutions.begin(), solutions.end(),
+		[](const auto& lhs, const auto& rhs)
+		{
+			return lhs->getCurrentTimeObjectiveFitness() < rhs->getCurrentTimeObjectiveFitness();
+		}
+	);
+	for (auto i = 0u; i < solutions.size() - 1; i++)
+	{
+		if (std::abs(solutions[i]->getCurrentTimeObjectiveFitness() - solutions[i + 1]->getCurrentTimeObjectiveFitness()) < 0.0001 &&
+			std::abs(solutions[i]->getCurrentMinusProfitObjectiveFitness() - solutions[i + 1]->getCurrentMinusProfitObjectiveFitness()) < 0.0001)
+		{
+			solutions[i]->mutation();
+		}
+	}
+}
+
+template<class Individual>
 void GAlg<Individual>::makeNextPopulation()
 {
 	solutionsSet.truncate(params.populationSize);
@@ -193,7 +249,8 @@ void GAlg<Individual>::insertToChildren(const Individual& parent1, const Individ
 	if (crossoverRnd <= params.crossoverProb)
 	{
 		auto offspring = parent1.crossoverNrx(parent2);
-		followWithMutation(*offspring);
+		// followWithMutation(*offspring);
+		mutationAwaiting.push_back(std::make_pair(offspring.get(), false));
 		children.push_back(std::move(offspring));
 	}
 	else
@@ -291,18 +348,18 @@ void GAlg<Individual>::asyncMutation()
 		std::make_unique<GenericLambdaAsyncTask>(
 			[this] (const uint32_t /*sugesstedNumberOfSubTasks*/)
 			{
-				std::cout << "Splitting task. Thread id=" << std::this_thread::get_id << std::endl;	
-				uint32_t awaitingNum = static_cast<uint32_t>(mutationAwaiting.size()) / 8u;
+				const uint32_t subTasksNum = 4u;
+				const uint32_t singleBatchSize = static_cast<uint32_t>(mutationAwaiting.size()) / subTasksNum;
 				std::vector<AsyncSubTaskPtr> subTasks;
-				for (auto i = 0u; i < awaitingNum + 1; i++)
+				for (auto i = 0u; i < subTasksNum + 1; i++)
 				{
+					uint32_t start = singleBatchSize * i;
+					uint32_t end = singleBatchSize * (i + 1);
 					subTasks.push_back(std::make_unique<GenericLambdaAsyncSubTask>(
-						[this, i] ()
+						[this, i, start, end] ()
 						{
-							std::cout << "subtask execution. I= " << i << " Thread id=" << std::this_thread::get_id << std::endl;
-							for (auto j = 8 * i; j < 8 * (i + 1) && j < mutationAwaiting.size(); j++)
+							for (auto j = start; j < end && j < mutationAwaiting.size(); j++)
 							{
-								std::cout << "subtask execution follow with mutatation. I= " << i << " J= " << j << " Thread id=" << std::this_thread::get_id << std::endl;
 								followWithMutation(*mutationAwaiting[j].first);
 								mutationAwaiting[j].second = true;
 								doneMutations++;
@@ -312,7 +369,7 @@ void GAlg<Individual>::asyncMutation()
 				}
 				return subTasks;
 			},
-			8u
+			4u
 	);
 	ExecutionManager executionManager(std::move(task));
 	executionManager.executeTask();

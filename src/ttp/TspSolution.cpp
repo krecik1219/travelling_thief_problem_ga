@@ -93,6 +93,9 @@ void TspSolution::mutation()
 			nearestCityIndex + neighbourhoodThreshold
 			: lastIndexInChain;
 	auto randomNeighbourIndex = random.getRandomUint(leftBound, rightBound);
+	while(randomNeighbourIndex == randomGene)
+		randomNeighbourIndex = random.getRandomUint(leftBound, rightBound);
+
 	std::swap(cityChain[randomGene], cityChain[randomNeighbourIndex]);
 }
 

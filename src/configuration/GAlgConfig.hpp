@@ -27,6 +27,7 @@ struct GAlgConfig
 	std::string paretoFrontValuesFile;
 	std::string allSolutionsValuesFile;
 	std::string frontSolutionsSortedValuesFile;
+	std::string hypervolumeValueFile;
 	std::string bestGreedyAlgPath;
 	std::string bestRandomAlgPath;
 	uint32_t naiveRepetitions;

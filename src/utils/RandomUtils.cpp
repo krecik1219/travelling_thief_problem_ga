@@ -11,6 +11,7 @@ Random& Random::getInstance()
 
 uint32_t Random::getRandomUint(const uint32_t min, const uint32_t max)
 {
+	std::lock_guard<std::mutex> lock(m);
 	std::uniform_int_distribution<uint32_t>::param_type distParam(min, max);
 	uintDis.param(distParam);
 	return uintDis(gen);
@@ -18,6 +19,7 @@ uint32_t Random::getRandomUint(const uint32_t min, const uint32_t max)
 
 int32_t Random::getRandomInt(const int32_t min, const int32_t max)
 {
+	std::lock_guard<std::mutex> lock(m);
 	std::uniform_int_distribution<int32_t>::param_type distParam(min, max);
 	intDis.param(distParam);
 	return intDis(gen);
@@ -25,12 +27,13 @@ int32_t Random::getRandomInt(const int32_t min, const int32_t max)
 
 double Random::getRandomDouble(const double min, const double max)
 {
+	std::lock_guard<std::mutex> lock(m);
 	std::uniform_real_distribution<double>::param_type distParam(min, max);
 	doubleDis.param(distParam);
 	return doubleDis(gen);
 }
 
-std::mt19937 & Random::getRndGen()
+std::mt19937& Random::getRndGen()
 {
 	return gen;
 }

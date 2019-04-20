@@ -13,6 +13,7 @@
 #include <naive/RandomSelectionAlg.hpp>
 #include <pareto/SolutionsSet.hpp>
 #include <gecco/SolutionsLogger.hpp>
+#include <gecco/HyperVolume2DCalculator.hpp>
 
 using namespace std::chrono_literals;
 using SteadyClock = std::chrono::steady_clock;
@@ -36,12 +37,23 @@ int main(int argc, char **argv)
 		auto ttpConfigBase = instanceLoader.loadTtpConfig(gAlgConfig.instanceFilePath);
 		auto ttpConfig = ttpConfigBase.getConfig();
 		auto createRandomFun = [&ttpConfig, &g]() {return ttp::TtpIndividual::createRandom(ttpConfig, g); };
+		const uint32_t bufferSize = std::max(50000u,
+			std::max(static_cast<uint32_t>(ttpConfig.items.size() * 2.5), static_cast<uint32_t>(ttpConfig.cities.size() * 2.5)));
 		gecco::SolutionsLogger solutionsLogger(gAlgConfig.paretoFrontSolutionsFile + suffix,
 			gAlgConfig.paretoFrontValuesFile + suffix, gAlgConfig.allSolutionsValuesFile + suffix,
-			gAlgConfig.frontSolutionsSortedValuesFile + suffix, static_cast<uint32_t>(ttpConfig.items.size() * 2.5));
+			gAlgConfig.frontSolutionsSortedValuesFile + suffix, bufferSize);
 		ga::GAlg<ttp::TtpIndividual> gAlg(gAlgConfig.gAlgParams, createRandomFun, solutionsLogger);
 
 		gAlg.run();
+
+		gecco::HyperVolume2DCalculator calc;
+
+		auto paretoFront = gAlg.getSolutionsSet().getParetoFront();
+
+		double hv = calc.calculateHyperVolume(paretoFront);
+
+		logging::Logger loggerHV(gAlgConfig.hypervolumeValueFile + suffix);
+		loggerHV.log("%.4f", hv);
 
 		/*logging::Logger logger2(gAlgConfig.bestIndividualResultFile + suffix);
 		auto bestIndividual = gAlg.getBestIndividual();

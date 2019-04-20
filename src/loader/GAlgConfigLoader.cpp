@@ -61,6 +61,11 @@ void GAlgConfigLoader::decideWhatToDoWithLine(const std::string& line, config::G
 		auto value = prepareValueToStore(line);
 		gAlgConfig.frontSolutionsSortedValuesFile = value;
 	}
+	else if (line.find("HYPERVOLUME VALUE FILE:") != std::string::npos)
+	{
+		auto value = prepareValueToStore(line);
+		gAlgConfig.hypervolumeValueFile = value;
+	}
 	else if (line.find("BEST GREEDY ALG PATH:") != std::string::npos)
 	{
 		auto value = prepareValueToStore(line);

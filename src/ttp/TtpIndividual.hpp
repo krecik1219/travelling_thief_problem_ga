@@ -34,6 +34,8 @@ public:
 	std::pair<double, double> evaluate();
 	double getCurrentTimeObjectiveFitness() const;
 	double getCurrentMinusProfitObjectiveFitness() const;
+	double getX() const;
+	double getY() const;
 	double getCurrentFitness() const;
 	void mutation();
 	std::unique_ptr<TtpIndividual> crossoverNrx(const TtpIndividual& parent2) const;
