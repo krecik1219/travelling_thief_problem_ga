@@ -70,10 +70,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;$(IncludePath)</IncludePath>
+    <IncludePath>D:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;$(IncludePath)</IncludePath>
+    <IncludePath>D:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -89,7 +89,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -118,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>G:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\studia\semestr 6\sztuczna_inteligencja_i_inzynieria_wiedzy\lab\lab1\ttp_ga\ttp_ga\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
